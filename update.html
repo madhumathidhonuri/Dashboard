@@ -8,8 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
   tailwind.config = {
     theme: {
@@ -19,34 +21,27 @@
           display: ['Space Grotesk', 'sans-serif'],
         },
         colors: {
-          sky: {
-            deep:  '#4aaed4',
-            mid:   '#74c6e8',
-            light: '#a8ddf5',
-            pale:  '#c8ecf8',
+          lb: {
+            50:  '#f0f8ff',
+            100: '#e0f0fe',
+            200: '#bae2fd',
+            300: '#7dcbfc',
+            400: '#38aff9',
+            500: '#0e96eb',
+            600: '#0278c9',
+            700: '#0360a3',
+            800: '#075186',
+            900: '#0c446f',
           },
-          danger:  '#ff6b8a',
-          success: '#4de8a0',
-          warning: '#ffd166',
-        },
-        backdropBlur: { glass: '24px' },
-        animation: {
-          'orb-float':    'orb-float 8s ease-in-out infinite',
-          'arc-spin':     'arc-spin 30s linear infinite',
-          'arc-spin-rev': 'arc-spin 20s linear infinite reverse',
-          'arc-spin-sm':  'arc-spin 15s linear infinite',
-          'streak-slide': 'streak-slide 6s ease-in-out infinite',
-          'float-card':   'float-card 5s ease-in-out infinite',
-          'pulse-dot':    'pulse-dot 2s infinite',
-          'shine':        'shine 6s ease-in-out infinite',
-        },
-        keyframes: {
-          'orb-float':    { '0%,100%': { transform: 'translateY(0) scale(1)' }, '50%': { transform: 'translateY(-30px) scale(1.05)' } },
-          'arc-spin':     { from: { transform: 'rotate(0deg)' }, to: { transform: 'rotate(360deg)' } },
-          'streak-slide': { '0%,100%': { opacity: '0.4', transform: 'translateX(0) rotate(-20deg)' }, '50%': { opacity: '0.9', transform: 'translateX(20px) rotate(-20deg)' } },
-          'float-card':   { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-8px)' } },
-          'pulse-dot':    { '0%,100%': { opacity: '1' }, '50%': { opacity: '0.5' } },
-          'shine':        { '0%': { transform: 'translateX(-100%) rotate(30deg)' }, '100%': { transform: 'translateX(300%) rotate(30deg)' } },
+          sky2: {
+            soft: '#daf1ff',
+            pale: '#eef8ff',
+            mid:  '#7dcbfc',
+          },
+          mint:    '#34d8b5',
+          coral:   '#f87171',
+          amber2:  '#fbbf24',
+          slate2:  '#64748b',
         },
       }
     }
@@ -57,210 +52,328 @@
   html, body { height: 100%; overflow-x: hidden; }
   body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #0a1f3a 0%, #0d2d4a 25%, #0f3d5a 50%, #1a4f6b 75%, #0d2d4a 100%);
-    min-height: 100vh; color: #ffffff;
+    background: linear-gradient(145deg, #eef8ff 0%, #daf1ff 35%, #e8f5fe 65%, #f0f8ff 100%);
+    min-height: 100vh; color: #0c446f;
   }
+
   /* ── BG EFFECTS ── */
-  .bg-orb { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%); animation: orb-float 8s ease-in-out infinite; }
-  .bg-arc { position: absolute; border-radius: 50%; border: 2px solid transparent; border-top: 2px solid rgba(255,255,255,0.7); border-right: 2px solid rgba(255,255,255,0.2); box-shadow: 0 0 18px rgba(255,255,255,0.35), inset 0 0 18px rgba(255,255,255,0.1); animation: arc-spin linear infinite; }
+  .bg-orb { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(56,175,249,0.12) 0%, transparent 70%); animation: orb-float 8s ease-in-out infinite; }
+  .bg-arc { position: absolute; border-radius: 50%; border: 1.5px solid transparent; border-top: 1.5px solid rgba(56,175,249,0.35); border-right: 1.5px solid rgba(56,175,249,0.08); box-shadow: 0 0 16px rgba(56,175,249,0.1); animation: arc-spin linear infinite; }
   .bg-arc.rev { animation-direction: reverse; }
-  .bg-streak { position: absolute; height: 2px; border-radius: 999px; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.8) 50%, transparent 100%); box-shadow: 0 0 12px rgba(255,255,255,0.5); animation: streak-slide 6s ease-in-out infinite; }
-  @keyframes orb-float   { 0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)} }
+  .bg-streak { position: absolute; height: 1.5px; border-radius: 999px; background: linear-gradient(90deg, transparent 0%, rgba(56,175,249,0.45) 50%, transparent 100%); animation: streak-slide 6s ease-in-out infinite; }
+
+  @keyframes orb-float   { 0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-28px) scale(1.04)} }
   @keyframes arc-spin    { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
-  @keyframes streak-slide{ 0%,100%{opacity:.4;transform:translateX(0) rotate(-20deg)}50%{opacity:.9;transform:translateX(20px) rotate(-20deg)} }
-  @keyframes float-card  { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
-  @keyframes pulse-dot   { 0%,100%{opacity:1}50%{opacity:.5} }
+  @keyframes streak-slide{ 0%,100%{opacity:.35;transform:translateX(0) rotate(-20deg)}50%{opacity:.85;transform:translateX(18px) rotate(-20deg)} }
+  @keyframes float-card  { 0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)} }
+  @keyframes pulse-dot   { 0%,100%{opacity:1}50%{opacity:.45} }
   @keyframes shine       { 0%{transform:translateX(-100%) rotate(30deg)}100%{transform:translateX(300%) rotate(30deg)} }
+
   /* ── GLASS ── */
-  .glass { background: rgba(8, 18, 32, 0.98); backdrop-filter: blur(18px) saturate(1.1); -webkit-backdrop-filter: blur(18px) saturate(1.1); border: 1px solid rgba(255,255,255,0.14); border-radius: 20px; box-shadow: 0 35px 120px rgba(0,0,0,0.45); }
-  .glass:hover { background: rgba(10, 22, 40, 1); }
-  .glass-card { position: relative; overflow: hidden; background: rgba(8, 16, 30, 0.96) !important; backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.14) !important; box-shadow: 0 16px 48px rgba(0,0,0,0.28) !important; }
-  .kpi-card { position: relative; overflow: hidden; background: rgba(8, 16, 30, 0.96) !important; backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.14) !important; box-shadow: 0 14px 42px rgba(0,0,0,0.26) !important; }
+  .glass {
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(20px) saturate(1.15);
+    -webkit-backdrop-filter: blur(20px) saturate(1.15);
+    border: 1px solid rgba(56,175,249,0.18);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(2,120,201,0.08);
+  }
+  .glass-card {
+    position: relative; overflow: hidden;
+    background: rgba(255,255,255,0.82) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(56,175,249,0.22) !important;
+    box-shadow: 0 12px 36px rgba(2,120,201,0.07) !important;
+  }
+  .kpi-card {
+    position: relative; overflow: hidden;
+    background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(234,246,255,0.92) 100%) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(56,175,249,0.28) !important;
+    box-shadow: 0 10px 32px rgba(2,120,201,0.09) !important;
+  }
+
   /* ── DASHBOARD HIDDEN ── */
   #dashboard { display: none; }
   #dashboard.active { display: flex; }
-  /* ── SIDEBAR ACTIVE NAV ── */
-  .nav-item.active { background: rgba(255,255,255,0.20); color: #fff; box-shadow: 0 4px 16px rgba(255,255,255,0.08); }
-  .nav-item.active::before { content:''; position:absolute; left:0; top:20%; bottom:20%; width:3px; background:#fff; border-radius:0 3px 3px 0; }
-  .nav-item:hover { background: rgba(255,255,255,0.12); color: #fff; }
-  /* ── LOGIN FORM INPUTS ── */
-  .ft-input { width:100%; padding:13px 16px 13px 40px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:12px; color:#fff; font-size:14px; font-family:'Inter',sans-serif; outline:none; transition:all 0.3s; }
-  .ft-input::placeholder { color:rgba(255,255,255,0.45); }
-  .ft-input:focus { background:rgba(255,255,255,0.14); border-color:rgba(255,255,255,0.5); box-shadow:0 0 0 3px rgba(255,255,255,0.1); }
+
+  /* ── SIDEBAR ── */
+  .nav-item.active {
+    background: linear-gradient(90deg, rgba(56,175,249,0.18) 0%, rgba(56,175,249,0.08) 100%);
+    color: #075186;
+    box-shadow: 0 3px 12px rgba(2,120,201,0.12);
+  }
+  .nav-item.active::before {
+    content:''; position:absolute; left:0; top:20%; bottom:20%; width:3px;
+    background: linear-gradient(180deg, #38aff9, #0278c9);
+    border-radius: 0 3px 3px 0;
+  }
+  .nav-item:hover { background: rgba(56,175,249,0.1); color: #075186; }
+
+  /* ── INPUTS ── */
+  .ft-input {
+    width:100%; padding:13px 16px 13px 40px;
+    background: rgba(218,241,255,0.5);
+    border: 1px solid rgba(56,175,249,0.3);
+    border-radius: 12px; color: #075186;
+    font-size: 14px; font-family:'Inter',sans-serif; outline:none; transition:all 0.3s;
+  }
+  .ft-input::placeholder { color: rgba(7,81,134,0.45); }
+  .ft-input:focus {
+    background: rgba(186,226,253,0.35);
+    border-color: rgba(56,175,249,0.55);
+    box-shadow: 0 0 0 3px rgba(56,175,249,0.12);
+  }
+
   /* ── BUTTONS ── */
-  .btn-signin { width:100%; padding:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); border-radius:14px; color:#fff; font-size:15px; font-weight:600; cursor:pointer; letter-spacing:.02em; transition:all 0.3s; box-shadow:0 8px 28px rgba(0,0,0,0.28); position:relative; overflow:hidden; }
-  .btn-signin:hover { background:rgba(255,255,255,0.2); transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,0,0,0.36); }
-  .btn-signin:hover::before { opacity:1; }
-  .btn-signin:active { transform:translateY(0); }
-  /* ── KPI CARD SHINE ── */
-  .kpi-card, .glass-card { position:relative; overflow:hidden; }
-  .kpi-card::after, .glass-card::after { content:''; position:absolute; top:0; left:0; width:40%; height:100%; background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.06) 50%,transparent 60%); animation:shine 6s ease-in-out infinite; pointer-events:none; border-radius:inherit; }
+  .btn-signin {
+    width:100%; padding:14px;
+    background: linear-gradient(135deg, rgba(14,150,235,0.18) 0%, rgba(2,120,201,0.14) 100%);
+    border: 1px solid rgba(56,175,249,0.45);
+    border-radius: 14px; color: #075186;
+    font-size:15px; font-weight:600; cursor:pointer;
+    letter-spacing:.02em; transition:all 0.3s;
+    box-shadow: 0 6px 22px rgba(2,120,201,0.14);
+    position:relative; overflow:hidden;
+  }
+  .btn-signin:hover {
+    background: linear-gradient(135deg, rgba(14,150,235,0.28) 0%, rgba(2,120,201,0.22) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(2,120,201,0.2);
+  }
+  .btn-signin:active { transform: translateY(0); }
+
+  /* ── SHINE ── */
+  .kpi-card::after, .glass-card::after {
+    content:''; position:absolute; top:0; left:0; width:40%; height:100%;
+    background: linear-gradient(105deg, transparent 40%, rgba(186,226,253,0.25) 50%, transparent 60%);
+    animation: shine 7s ease-in-out infinite; pointer-events:none; border-radius:inherit;
+  }
+
   /* ── STATUS DOT ── */
-  .status-dot { width:8px; height:8px; border-radius:50%; background:#4de8a0; box-shadow:0 0 8px #4de8a0; animation:pulse-dot 2s infinite; }
+  .status-dot {
+    width:8px; height:8px; border-radius:50%;
+    background: #34d8b5;
+    box-shadow: 0 0 7px rgba(52,216,181,0.7);
+    animation: pulse-dot 2s infinite;
+  }
+
   /* ── VEHICLE SELECTOR ── */
-  .veh-opt:hover, .veh-opt.selected { background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.35); }
+  .veh-opt:hover, .veh-opt.selected {
+    background: rgba(218,241,255,0.75) !important;
+    border-color: rgba(56,175,249,0.4) !important;
+  }
+
   /* ── FUEL BAR ── */
-  .fuel-bar-bg { height:8px; border-radius:4px; background:rgba(255,255,255,0.12); overflow:hidden; }
-  .fuel-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#4aaed4,rgba(130,210,255,0.5)); transition:width 0.8s ease; }
-  /* ── TIMELINE CONNECTOR ── */
-  .tl-item:not(:last-child)::after { content:''; position:absolute; left:15px; top:38px; bottom:0; width:1px; background:rgba(255,255,255,0.12); }
+  .fuel-bar-bg { height:8px; border-radius:4px; background:rgba(56,175,249,0.12); overflow:hidden; }
+  .fuel-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#38aff9,#7dcbfc); transition:width 0.8s ease; }
+
+  /* ── TIMELINE ── */
+  .tl-item:not(:last-child)::after {
+    content:''; position:absolute; left:15px; top:38px; bottom:0;
+    width:1px; background:rgba(56,175,249,0.2);
+  }
+
   /* ── ALERT ITEMS ── */
-  .alert-item:hover { background:rgba(255,255,255,0.12); }
+  .alert-item:hover { background:rgba(218,241,255,0.6) !important; }
+
   /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar { width:4px; }
   ::-webkit-scrollbar-track { background:transparent; }
-  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.25); border-radius:3px; }
+  ::-webkit-scrollbar-thumb { background:rgba(56,175,249,0.3); border-radius:3px; }
+
   /* ── HEALTH RING ── */
   .health-ring { position:relative; display:inline-block; }
   .health-ring svg { transform:rotate(-90deg); }
-  .health-ring .ring-val { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; }
-  /* ── MAP ── */
-  #mapCanvas { width:100%; height:100%; min-height:420px; display:block; }
+  .health-ring .ring-val {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; color:#075186;
+  }
+
+  /* ── MAP — NO GAP FIX ── */
+  .map-container {
+    display: flex;
+    flex-direction: column;
+    height: 460px;          /* fixed total height for the card */
+  }
+  #osmMap {
+    flex: 1;                /* fill remaining height after the header row */
+    width: 100%;
+    min-height: 0;          /* prevent flex-child overflow */
+    z-index: 0;
+  }
+  .leaflet-container { font-family:'Inter',sans-serif; }
+  .zone-label { background:rgba(7,81,134,0.82)!important; color:#fff!important; border:1px solid rgba(56,175,249,0.4)!important; border-radius:6px!important; font-size:10px!important; font-weight:700!important; letter-spacing:.06em!important; padding:3px 8px!important; box-shadow:none!important; }
+  .zone-label::before { display:none!important; }
+  .leaflet-popup-content-wrapper { border-radius:12px!important; border:1px solid rgba(56,175,249,0.25)!important; box-shadow:0 8px 24px rgba(2,120,201,0.12)!important; }
+  .leaflet-popup-tip { display:none!important; }
+  @keyframes veh-pulse-anim { 0%{transform:scale(1);opacity:0.7} 100%{transform:scale(2.8);opacity:0} }
+
   /* ── NOTIF BADGE ── */
-  .notif-badge { position:absolute; top:-4px; right:-4px; width:16px; height:16px; border-radius:50%; background:#ff6b8a; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; border:2px solid rgba(90,185,220,0.8); }
+  .notif-badge {
+    position:absolute; top:-4px; right:-4px; width:16px; height:16px;
+    border-radius:50%; background:#f87171; font-size:9px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid rgba(248,113,113,0.25); color:#fff;
+  }
+
   /* ── LOGIN CARD TOP LINE ── */
-  .login-form-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.7),transparent); }
+  .login-form-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background: linear-gradient(90deg, transparent, rgba(56,175,249,0.4), transparent);
+  }
+
   /* ── ROUTE SVG ── */
-  .route-svg { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; opacity:0.25; }
-  /* ── FLOATING VEHCARDS BOTTOM ── */
+  .route-svg { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; opacity:0.22; }
+
+  /* ── FLOATING CARDS ── */
   .veh-card-float { animation:float-card 4s ease-in-out infinite; }
   .veh-card-float:nth-child(2) { animation-delay:-2s; }
-  /* ── FSTAT FLOAT ── */
   .fstat-float { animation:float-card 5s ease-in-out infinite; }
   .fstat-float:nth-child(2) { animation-delay:-1.5s; }
   .fstat-float:nth-child(3) { animation-delay:-3s; }
+
   /* ── NAV SECTION TITLES ── */
-  .nav-section { font-size:10px; font-weight:600; letter-spacing:.1em; color:rgba(255,255,255,0.5); text-transform:uppercase; padding:14px 10px 6px; margin-top:8px; }
-  /* MAP CONTAINER FULL HEIGHT */
-  .map-container { min-height: 420px; }
+  .nav-section {
+    font-size:10px; font-weight:600; letter-spacing:.1em;
+    color:rgba(7,81,134,0.5); text-transform:uppercase;
+    padding:14px 10px 6px; margin-top:8px;
+  }
+
+  /* ── TOPBAR GRADIENT ── */
+  .topbar-grad {
+    background: linear-gradient(135deg, rgba(218,241,255,0.95) 0%, rgba(186,226,253,0.9) 50%, rgba(218,241,255,0.9) 100%);
+  }
+
+  /* ── BADGE COLORS ── */
+  .badge-moving  { background:rgba(52,216,181,0.18); color:#0a8f78; }
+  .badge-idle    { background:rgba(251,191,36,0.18); color:#92650a; }
+  .badge-stopped { background:rgba(248,113,113,0.18); color:#b91c1c; }
 </style>
 </head>
-<body class="min-h-screen text-white overflow-x-hidden">
+<body class="min-h-screen overflow-x-hidden">
 
-<!-- ═══════════════════════════ BG CANVAS ═══════════════════════════ -->
+<!-- ═══ BG CANVAS ═══ -->
 <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-  <!-- Orbs -->
-  <div class="bg-orb w-[600px] h-[600px] -top-36 right-[5%]" style="animation-delay:0s"></div>
-  <div class="bg-orb w-[400px] h-[400px] bottom-[10%] -left-20" style="animation-delay:-3s"></div>
-  <div class="bg-orb w-[300px] h-[300px] top-[40%] right-[20%]" style="animation-delay:-5s"></div>
-  <!-- Arcs -->
-  <div class="bg-arc w-[700px] h-[700px] -top-44 -right-24" style="animation-duration:30s"></div>
-  <div class="bg-arc rev w-[400px] h-[400px] -bottom-24 -left-20" style="animation-duration:20s"></div>
-  <div class="bg-arc w-[220px] h-[220px] top-[55%] right-[15%] opacity-60" style="animation-duration:15s"></div>
-  <!-- Streaks -->
-  <div class="bg-streak w-[300px] top-[22%] left-[5%]" style="animation-delay:0s"></div>
-  <div class="bg-streak w-[180px] top-[65%] right-[8%] rotate-[15deg]" style="animation-delay:-2s"></div>
-  <div class="bg-streak w-[250px] top-[42%] left-[30%] -rotate-[10deg]" style="animation-delay:-4s"></div>
+  <div class="bg-orb w-[700px] h-[700px] -top-48 right-[3%]" style="animation-delay:0s"></div>
+  <div class="bg-orb w-[450px] h-[450px] bottom-[8%] -left-24" style="animation-delay:-3s"></div>
+  <div class="bg-orb w-[320px] h-[320px] top-[38%] right-[18%]" style="animation-delay:-5s"></div>
+  <div class="bg-arc w-[760px] h-[760px] -top-48 -right-28" style="animation-duration:32s"></div>
+  <div class="bg-arc rev w-[450px] h-[450px] -bottom-28 -left-24" style="animation-duration:22s"></div>
+  <div class="bg-arc w-[230px] h-[230px] top-[52%] right-[12%] opacity-50" style="animation-duration:16s"></div>
+  <div class="bg-streak w-[320px] top-[20%] left-[4%]" style="animation-delay:0s"></div>
+  <div class="bg-streak w-[200px] top-[62%] right-[6%] rotate-[15deg]" style="animation-delay:-2s"></div>
+  <div class="bg-streak w-[260px] top-[40%] left-[28%] -rotate-[10deg]" style="animation-delay:-4s"></div>
 </div>
 
-<!-- ═══════════════════════════ LOGIN PAGE ═══════════════════════════ -->
+<!-- ═══ LOGIN PAGE ═══ -->
 <div id="loginPage" class="fixed inset-0 z-[100] flex items-stretch">
 
   <!-- LEFT HERO -->
   <div class="flex-[1.1] relative overflow-hidden flex flex-col justify-center px-16 py-16">
-    <div class="absolute inset-0" style="background:linear-gradient(145deg,rgba(90,185,220,0.3)0%,rgba(60,150,200,0.15)100%)"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(145deg, rgba(56,175,249,0.08) 0%, rgba(186,226,253,0.05) 100%)"></div>
 
-    <!-- SVG Routes -->
     <svg class="route-svg" viewBox="0 0 600 700" preserveAspectRatio="none">
-      <path d="M50,200 Q200,150 350,300 T550,450" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="6 4"/>
-      <path d="M80,400 Q250,350 380,500 T560,600" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" fill="none" stroke-dasharray="4 6"/>
-      <circle cx="50" cy="200" r="5" fill="rgba(255,255,255,0.7)"/>
-      <circle cx="350" cy="300" r="5" fill="rgba(255,255,255,0.7)"/>
-      <circle cx="550" cy="450" r="5" fill="rgba(255,255,255,0.7)"/>
-      <circle cx="80" cy="400" r="4" fill="rgba(255,255,255,0.5)"/>
-      <circle cx="380" cy="500" r="4" fill="rgba(255,255,255,0.5)"/>
+      <path d="M50,200 Q200,150 350,300 T550,450" stroke="rgba(56,175,249,0.35)" stroke-width="1.5" fill="none" stroke-dasharray="6 4"/>
+      <path d="M80,400 Q250,350 380,500 T560,600" stroke="rgba(56,175,249,0.18)" stroke-width="1.5" fill="none" stroke-dasharray="4 6"/>
+      <circle cx="50" cy="200" r="5" fill="rgba(56,175,249,0.5)"/>
+      <circle cx="350" cy="300" r="5" fill="rgba(56,175,249,0.5)"/>
+      <circle cx="550" cy="450" r="5" fill="rgba(56,175,249,0.5)"/>
+      <circle cx="80" cy="400" r="4" fill="rgba(56,175,249,0.3)"/>
+      <circle cx="380" cy="500" r="4" fill="rgba(56,175,249,0.3)"/>
     </svg>
 
-    <!-- Brand -->
     <div class="relative z-10 flex items-center gap-3 mb-14">
-      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-xl" style="background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.4)">
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+           style="background:linear-gradient(135deg,rgba(56,175,249,0.2),rgba(2,120,201,0.12));border:1px solid rgba(56,175,249,0.35);color:#0278c9">
         <i class="fa-solid fa-gas-pump"></i>
       </div>
-      <span class="font-display text-xl font-bold">FuelTracks</span>
+      <span class="font-display text-xl font-bold text-lb-800">FuelTracks</span>
     </div>
 
-    <!-- Hero Text -->
     <div class="relative z-10">
-      <h1 class="font-display font-extrabold leading-[1.1] tracking-tight mb-5" style="font-size:clamp(32px,4vw,52px)">Smart Fleet<br>Management</h1>
-      <p class="text-base leading-relaxed mb-10 max-w-sm" style="color:rgba(255,255,255,0.75)">
+      <h1 class="font-display font-extrabold leading-[1.1] tracking-tight mb-5 text-lb-900"
+          style="font-size:clamp(32px,4vw,52px)">Smart Fleet<br>Management</h1>
+      <p class="text-base leading-relaxed mb-10 max-w-sm text-lb-700">
         Real-time vehicle tracking, fuel monitoring, and advanced analytics — unified in one elegant platform.
       </p>
 
-      <!-- Fleet Stats -->
       <div class="flex gap-4 flex-wrap mb-12">
-        <div class="fstat-float rounded-2xl px-5 py-4" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.3)">
-          <div class="font-display text-[26px] font-bold">247</div>
-          <div class="text-[11px] uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.75)">Active Vehicles</div>
+        <div class="fstat-float rounded-2xl px-5 py-4"
+             style="background:rgba(255,255,255,0.72);backdrop-filter:blur(16px);border:1px solid rgba(56,175,249,0.28);box-shadow:0 8px 24px rgba(2,120,201,0.1)">
+          <div class="font-display text-[26px] font-bold text-lb-700">247</div>
+          <div class="text-[11px] uppercase tracking-widest mt-0.5 text-lb-500">Active Vehicles</div>
         </div>
-        <div class="fstat-float rounded-2xl px-5 py-4" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.3)">
-          <div class="font-display text-[26px] font-bold">94.2%</div>
-          <div class="text-[11px] uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.75)">Fleet Uptime</div>
+        <div class="fstat-float rounded-2xl px-5 py-4"
+             style="background:rgba(255,255,255,0.72);backdrop-filter:blur(16px);border:1px solid rgba(56,175,249,0.28);box-shadow:0 8px 24px rgba(2,120,201,0.1)">
+          <div class="font-display text-[26px] font-bold text-lb-700">94.2%</div>
+          <div class="text-[11px] uppercase tracking-widest mt-0.5 text-lb-500">Fleet Uptime</div>
         </div>
-        <div class="fstat-float rounded-2xl px-5 py-4" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.3)">
-          <div class="font-display text-[26px] font-bold">18.4 km/L</div>
-          <div class="text-[11px] uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.75)">Avg Efficiency</div>
+        <div class="fstat-float rounded-2xl px-5 py-4"
+             style="background:rgba(255,255,255,0.72);backdrop-filter:blur(16px);border:1px solid rgba(56,175,249,0.28);box-shadow:0 8px 24px rgba(2,120,201,0.1)">
+          <div class="font-display text-[26px] font-bold text-lb-700">18.4 km/L</div>
+          <div class="text-[11px] uppercase tracking-widest mt-0.5 text-lb-500">Avg Efficiency</div>
         </div>
       </div>
     </div>
 
-    <!-- Vehicle Cards -->
     <div class="absolute bottom-8 right-10 flex gap-3.5 z-10">
-      <div class="veh-card-float rounded-[18px] px-4 py-4 text-center transition-transform duration-300" style="background:rgba(255,255,255,0.13);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.3)">
+      <div class="veh-card-float rounded-[18px] px-4 py-4 text-center"
+           style="background:rgba(255,255,255,0.75);backdrop-filter:blur(18px);border:1px solid rgba(56,175,249,0.28);color:#0278c9;box-shadow:0 8px 24px rgba(2,120,201,0.1)">
         <i class="fa-solid fa-truck text-3xl block mb-2"></i>
-        <span class="text-[11px]" style="color:rgba(255,255,255,0.75)">Freight</span>
+        <span class="text-[11px] text-lb-500">Freight</span>
       </div>
-      <div class="veh-card-float rounded-[18px] px-4 py-4 text-center transition-transform duration-300" style="background:rgba(255,255,255,0.13);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.3)">
+      <div class="veh-card-float rounded-[18px] px-4 py-4 text-center"
+           style="background:rgba(255,255,255,0.75);backdrop-filter:blur(18px);border:1px solid rgba(56,175,249,0.28);color:#0278c9;box-shadow:0 8px 24px rgba(2,120,201,0.1)">
         <i class="fa-solid fa-van-shuttle text-3xl block mb-2"></i>
-        <span class="text-[11px]" style="color:rgba(255,255,255,0.75)">Delivery</span>
+        <span class="text-[11px] text-lb-500">Delivery</span>
       </div>
-      <div class="veh-card-float rounded-[18px] px-4 py-4 text-center transition-transform duration-300" style="background:rgba(255,255,255,0.13);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.3)">
+      <div class="veh-card-float rounded-[18px] px-4 py-4 text-center"
+           style="background:rgba(255,255,255,0.75);backdrop-filter:blur(18px);border:1px solid rgba(56,175,249,0.28);color:#0278c9;box-shadow:0 8px 24px rgba(2,120,201,0.1)">
         <i class="fa-solid fa-car text-3xl block mb-2"></i>
-        <span class="text-[11px]" style="color:rgba(255,255,255,0.75)">Fleet</span>
+        <span class="text-[11px] text-lb-500">Fleet</span>
       </div>
     </div>
   </div>
 
   <!-- RIGHT FORM -->
-  <div class="w-[480px] min-w-[400px] flex items-center justify-center p-10 relative" style="background:rgba(8,28,56,0.72);backdrop-filter:blur(20px);border-left:1px solid rgba(255,255,255,0.12)">
+  <div class="w-[480px] min-w-[400px] flex items-center justify-center p-10 relative"
+       style="background:rgba(240,248,255,0.9);backdrop-filter:blur(20px);border-left:1px solid rgba(56,175,249,0.18)">
     <div class="login-form-card w-full max-w-[380px] rounded-[28px] px-10 py-11 relative overflow-hidden"
-         style="background:linear-gradient(180deg, rgba(8,22,42,0.98), rgba(12,38,68,0.98));backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.16);box-shadow:0 40px 120px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.08)">
+         style="background:linear-gradient(180deg, rgba(255,255,255,0.97), rgba(234,246,255,0.95));backdrop-filter:blur(24px);border:1px solid rgba(56,175,249,0.22);box-shadow:0 32px 100px rgba(2,120,201,0.1), inset 0 1px 0 rgba(56,175,249,0.12)">
 
-      <!-- Logo -->
       <div class="flex items-center gap-2.5 mb-8">
         <div class="w-10 h-10 rounded-[10px] flex items-center justify-center text-[18px]"
-             style="background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.45);box-shadow:0 4px 16px rgba(255,255,255,0.15)">
+             style="background:linear-gradient(135deg,rgba(56,175,249,0.2),rgba(2,120,201,0.12));border:1px solid rgba(56,175,249,0.35);box-shadow:0 4px 14px rgba(2,120,201,0.12);color:#0278c9">
           <i class="fa-solid fa-gas-pump"></i>
         </div>
-        <div class="font-display font-bold text-[18px]">FuelTracks</div>
+        <div class="font-display font-bold text-[18px] text-lb-800">FuelTracks</div>
       </div>
 
-      <h2 class="font-display text-[26px] font-bold mb-1.5">Welcome Back</h2>
-      <p class="text-[13px] mb-8" style="color:rgba(255,255,255,0.75)">Sign in to your fleet command center</p>
+      <h2 class="font-display text-[26px] font-bold mb-1.5 text-lb-900">Welcome Back</h2>
+      <p class="text-[13px] mb-8 text-lb-600">Sign in to your fleet command center</p>
 
-      <!-- Email -->
       <div class="mb-[18px]">
-        <label class="block text-[12px] font-medium uppercase tracking-[0.06em] mb-1.5" style="color:rgba(255,255,255,0.75)">Email Address</label>
+        <label class="block text-[12px] font-medium uppercase tracking-[0.06em] mb-1.5 text-lb-700">Email Address</label>
         <div class="relative">
-          <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px]" style="color:rgba(255,255,255,0.5)"></i>
+          <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] text-lb-400"></i>
           <input type="email" id="emailInput" class="ft-input" placeholder="admin@fueltracks.io" value="admin@fueltracks.io">
         </div>
       </div>
 
-      <!-- Password -->
       <div class="mb-[18px]">
-        <label class="block text-[12px] font-medium uppercase tracking-[0.06em] mb-1.5" style="color:rgba(255,255,255,0.75)">Password</label>
+        <label class="block text-[12px] font-medium uppercase tracking-[0.06em] mb-1.5 text-lb-700">Password</label>
         <div class="relative">
-          <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px]" style="color:rgba(255,255,255,0.5)"></i>
+          <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] text-lb-400"></i>
           <input type="password" id="passInput" class="ft-input" placeholder="••••••••" value="password">
         </div>
       </div>
 
-      <!-- Remember / Forgot -->
       <div class="flex items-center justify-between mb-6">
-        <label class="flex items-center gap-2 text-[13px] cursor-pointer" style="color:rgba(255,255,255,0.75)">
-          <input type="checkbox" checked class="accent-white"> Remember me
+        <label class="flex items-center gap-2 text-[13px] cursor-pointer text-lb-600">
+          <input type="checkbox" checked class="accent-sky-500"> Remember me
         </label>
-        <a href="#" class="text-[13px] hover:text-white hover:underline transition-colors" style="color:rgba(255,255,255,0.85)">Forgot password?</a>
+        <a href="#" class="text-[13px] text-lb-500 hover:text-lb-700 hover:underline transition-colors">Forgot password?</a>
       </div>
 
       <button class="btn-signin" onclick="signIn()">
@@ -270,72 +383,71 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════ DASHBOARD ═══════════════════════════ -->
+<!-- ═══ DASHBOARD ═══ -->
 <div id="dashboard" class="relative z-10 min-h-screen">
 
   <!-- SIDEBAR -->
   <aside class="w-[220px] min-h-screen fixed left-0 top-0 bottom-0 flex flex-col z-50 py-6"
-         style="background:rgba(6,14,26,0.94);backdrop-filter:blur(28px);border-right:1px solid rgba(255,255,255,0.14);box-shadow:4px 0 28px rgba(0,0,0,0.32)">
+         style="background:rgba(240,248,255,0.95);backdrop-filter:blur(28px);border-right:1px solid rgba(56,175,249,0.15);box-shadow:4px 0 24px rgba(2,120,201,0.06);color:#075186">
 
-    <!-- Brand -->
-    <div class="flex items-center gap-2.5 px-5 pb-7 mb-4" style="border-bottom:1px solid rgba(255,255,255,0.15)">
-      <div class="w-9 h-9 rounded-[10px] flex items-center justify-center text-[16px]" style="background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.4)">
+    <div class="flex items-center gap-2.5 px-5 pb-7 mb-4" style="border-bottom:1px solid rgba(56,175,249,0.15)">
+      <div class="w-9 h-9 rounded-[10px] flex items-center justify-center text-[16px]"
+           style="background:linear-gradient(135deg,rgba(56,175,249,0.22),rgba(2,120,201,0.14));border:1px solid rgba(56,175,249,0.35);color:#0278c9">
         <i class="fa-solid fa-gas-pump"></i>
       </div>
-      <div class="font-display text-[17px] font-bold">FuelTracks</div>
+      <div class="font-display text-[17px] font-bold text-lb-800">FuelTracks</div>
     </div>
 
-    <!-- Nav -->
     <nav class="flex-1 px-3 overflow-y-auto">
       <div class="nav-section">Overview</div>
-      <div class="nav-item active flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" onclick="setActive(this)">
+      <div class="nav-item active flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-800" onclick="setActive(this)">
         <i class="fa-solid fa-gauge-high w-[18px] text-center text-[14px]"></i> Dashboard
       </div>
 
       <div class="nav-section">Fleet</div>
-      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" style="color:rgba(255,255,255,0.75)" onclick="setActive(this)">
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-600" onclick="setActive(this)">
         <i class="fa-solid fa-truck w-[18px] text-center text-[14px]"></i> Vehicles
-        <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:#ff6b8a;color:#fff">247</span>
+        <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:#0278c9;color:#fff">247</span>
       </div>
-      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" style="color:rgba(255,255,255,0.75)" onclick="setActive(this)">
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-600" onclick="setActive(this)">
         <i class="fa-solid fa-id-badge w-[18px] text-center text-[14px]"></i> Drivers
       </div>
-      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" style="color:rgba(255,255,255,0.75)" onclick="setActive(this)">
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-600" onclick="setActive(this)">
         <i class="fa-solid fa-location-dot w-[18px] text-center text-[14px]"></i> Live Tracking
       </div>
-      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" style="color:rgba(255,255,255,0.75)" onclick="setActive(this)">
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-600" onclick="setActive(this)">
         <i class="fa-solid fa-gas-pump w-[18px] text-center text-[14px]"></i> Fuel Monitoring
       </div>
-      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" style="color:rgba(255,255,255,0.75)" onclick="setActive(this)">
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-600" onclick="setActive(this)">
         <i class="fa-solid fa-route w-[18px] text-center text-[14px]"></i> Trips
       </div>
 
       <div class="nav-section">Operations</div>
-      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" style="color:rgba(255,255,255,0.75)" onclick="setActive(this)">
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-600" onclick="setActive(this)">
         <i class="fa-solid fa-wrench w-[18px] text-center text-[14px]"></i> Maintenance
-        <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:#ff6b8a;color:#fff">4</span>
+        <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:#f87171;color:#fff">4</span>
       </div>
-      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" style="color:rgba(255,255,255,0.75)" onclick="setActive(this)">
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-600" onclick="setActive(this)">
         <i class="fa-solid fa-chart-line w-[18px] text-center text-[14px]"></i> Reports
       </div>
-      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" style="color:rgba(255,255,255,0.75)" onclick="setActive(this)">
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-600" onclick="setActive(this)">
         <i class="fa-solid fa-bell w-[18px] text-center text-[14px]"></i> Alerts
-        <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:#ff6b8a;color:#fff">7</span>
+        <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:#f87171;color:#fff">7</span>
       </div>
-      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200" style="color:rgba(255,255,255,0.75)" onclick="setActive(this)">
+      <div class="nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer relative overflow-hidden text-[13.5px] font-medium mb-0.5 transition-all duration-200 text-lb-600" onclick="setActive(this)">
         <i class="fa-solid fa-gear w-[18px] text-center text-[14px]"></i> Settings
       </div>
     </nav>
 
-    <!-- User Footer -->
-    <div class="px-5 pt-4" style="border-top:1px solid rgba(255,255,255,0.15)">
+    <div class="px-5 pt-4" style="border-top:1px solid rgba(56,175,249,0.15)">
       <div class="flex items-center gap-2.5">
-        <div class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-[14px]" style="background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.3)">
+        <div class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-[14px]"
+             style="background:linear-gradient(135deg,rgba(56,175,249,0.22),rgba(2,120,201,0.14));border:2px solid rgba(56,175,249,0.3);color:#0278c9">
           <i class="fa-solid fa-user"></i>
         </div>
         <div>
-          <div class="text-[13px] font-semibold">Admin</div>
-          <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">Fleet Manager</div>
+          <div class="text-[13px] font-semibold text-lb-800">Admin</div>
+          <div class="text-[11px] text-lb-500">Fleet Manager</div>
         </div>
       </div>
     </div>
@@ -345,36 +457,36 @@
   <div class="ml-[220px] flex flex-col min-h-screen">
 
     <!-- TOPBAR -->
-    <div class="sticky top-0 z-40 flex items-center gap-4 px-7 py-3.5" style="background:rgba(8,16,30,0.92);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,0.14);box-shadow:0 2px 18px rgba(0,0,0,0.22)">
-      <!-- Search -->
+    <div class="sticky top-0 z-40 flex items-center gap-4 px-7 py-3.5 topbar-grad"
+         style="backdrop-filter:blur(24px);border-bottom:1px solid rgba(56,175,249,0.25);box-shadow:0 2px 16px rgba(2,120,201,0.1)">
+
       <div class="relative flex-1 max-w-[360px]">
-        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px]" style="color:rgba(255,255,255,0.5)"></i>
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-lb-400"></i>
         <input type="text" placeholder="Search vehicles, drivers, routes…"
-             class="w-full py-2 pl-9 pr-4 rounded-full text-[13px] text-white outline-none transition-all duration-300"
-             style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);">
+               class="w-full py-2 pl-9 pr-4 rounded-full text-[13px] outline-none transition-all duration-300 text-lb-700"
+               style="background:rgba(255,255,255,0.65);border:1px solid rgba(56,175,249,0.32);">
       </div>
 
-      <!-- Right controls -->
       <div class="flex items-center gap-2.5 ml-auto">
-        <!-- Status pill -->
-        <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18)">
+        <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium text-lb-700"
+             style="background:rgba(52,216,181,0.15);border:1px solid rgba(52,216,181,0.35);">
           <div class="status-dot"></div> Fleet Online
         </div>
-        <!-- Notifications -->
-        <div class="w-9 h-9 rounded-[10px] flex items-center justify-center cursor-pointer relative transition-all duration-200" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18)">
-          <i class="fa-solid fa-bell text-[14px]" style="color:rgba(255,255,255,0.75)"></i>
+        <div class="w-9 h-9 rounded-[10px] flex items-center justify-center cursor-pointer relative"
+             style="background:rgba(255,255,255,0.7);border:1px solid rgba(56,175,249,0.3);">
+          <i class="fa-solid fa-bell text-[14px] text-lb-600"></i>
           <div class="notif-badge">7</div>
         </div>
-        <!-- Expand -->
-        <div class="w-9 h-9 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18)">
-          <i class="fa-solid fa-expand text-[14px]" style="color:rgba(255,255,255,0.75)"></i>
+        <div class="w-9 h-9 rounded-[10px] flex items-center justify-center cursor-pointer"
+             style="background:rgba(255,255,255,0.7);border:1px solid rgba(56,175,249,0.3);">
+          <i class="fa-solid fa-expand text-[14px] text-lb-600"></i>
         </div>
-        <!-- Avatar -->
-        <div class="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200" style="background:rgba(255,255,255,0.14);border:2px solid rgba(255,255,255,0.3)">
-          <i class="fa-solid fa-user text-[15px]"></i>
+        <div class="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer"
+             style="background:linear-gradient(135deg,rgba(56,175,249,0.25),rgba(2,120,201,0.18));border:2px solid rgba(56,175,249,0.35)">
+          <i class="fa-solid fa-user text-[15px] text-lb-700"></i>
         </div>
-        <!-- Logout -->
-        <button onclick="logout()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] text-[12px] font-medium transition-all duration-200 cursor-pointer" style="background:rgba(255,80,100,0.22);border:1px solid rgba(255,80,100,0.35);color:#ff8fa3;font-family:'Inter',sans-serif">
+        <button onclick="logout()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] text-[12px] font-medium transition-all duration-200 cursor-pointer"
+                style="background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:#b91c1c;font-family:'Inter',sans-serif">
           <i class="fa-solid fa-right-from-bracket"></i> Logout
         </button>
       </div>
@@ -383,331 +495,413 @@
     <!-- PAGE CONTENT -->
     <div class="flex-1 p-7 overflow-y-auto">
 
-      <!-- GREETING -->
       <div class="mb-7">
-        <h2 class="font-display text-[28px] font-bold mb-1">Welcome back, Admin 👋</h2>
-        <p id="liveTime" class="text-[13px]" style="color:rgba(255,255,255,0.75)">Loading time…</p>
+        <h2 class="font-display text-[28px] font-bold mb-1 text-lb-800">Welcome back, Admin 👋</h2>
+        <p id="liveTime" class="text-[13px] text-lb-500">Loading time…</p>
       </div>
 
       <!-- KPI GRID -->
       <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-7">
 
-        <!-- KPI Card macro: repeated 6 times -->
-        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default"
-             style="background:rgba(8,16,30,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 32px rgba(0,0,0,0.28)">
+        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default">
           <div class="flex items-start justify-between mb-3.5">
-            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px]" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25)">
+            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px] text-lb-600"
+                 style="background:rgba(56,175,249,0.14);border:1px solid rgba(56,175,249,0.25)">
               <i class="fa-solid fa-heart-pulse"></i>
             </div>
-            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg" style="background:rgba(77,232,160,0.15);color:#4de8a0">
+            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg"
+                 style="background:rgba(52,216,181,0.14);color:#0a8f78">
               <i class="fa-solid fa-arrow-up"></i> 2.1%
             </div>
           </div>
-          <div class="font-display text-[28px] font-bold leading-none mb-1">96.4</div>
-          <div class="text-[12px] uppercase tracking-[0.06em]" style="color:rgba(255,255,255,0.75)">Fleet Health</div>
+          <div class="font-display text-[28px] font-bold leading-none mb-1 text-lb-700">96.4</div>
+          <div class="text-[12px] uppercase tracking-[0.06em] text-lb-500">Fleet Health</div>
           <div class="mt-3 h-9"><canvas id="chart_health"></canvas></div>
         </div>
 
-        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default"
-             style="background:rgba(8,16,30,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 32px rgba(0,0,0,0.28)">
+        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default">
           <div class="flex items-start justify-between mb-3.5">
-            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px]" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25)"><i class="fa-solid fa-route"></i></div>
-            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg" style="background:rgba(77,232,160,0.15);color:#4de8a0"><i class="fa-solid fa-arrow-up"></i> 8</div>
+            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px] text-lb-600"
+                 style="background:rgba(56,175,249,0.14);border:1px solid rgba(56,175,249,0.25)">
+              <i class="fa-solid fa-route"></i>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg"
+                 style="background:rgba(52,216,181,0.14);color:#0a8f78">
+              <i class="fa-solid fa-arrow-up"></i> 8
+            </div>
           </div>
-          <div class="font-display text-[28px] font-bold leading-none mb-1">34</div>
-          <div class="text-[12px] uppercase tracking-[0.06em]" style="color:rgba(255,255,255,0.75)">Active Trips</div>
+          <div class="font-display text-[28px] font-bold leading-none mb-1 text-lb-700">34</div>
+          <div class="text-[12px] uppercase tracking-[0.06em] text-lb-500">Active Trips</div>
           <div class="mt-3 h-9"><canvas id="chart_trips"></canvas></div>
         </div>
 
-        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default"
-             style="background:rgba(8,16,30,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 32px rgba(0,0,0,0.28)">
+        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default">
           <div class="flex items-start justify-between mb-3.5">
-            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px]" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25)"><i class="fa-solid fa-truck"></i></div>
-            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg" style="background:rgba(77,232,160,0.15);color:#4de8a0"><i class="fa-solid fa-arrow-up"></i> 3</div>
+            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px] text-lb-600"
+                 style="background:rgba(56,175,249,0.14);border:1px solid rgba(56,175,249,0.25)">
+              <i class="fa-solid fa-truck"></i>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg"
+                 style="background:rgba(52,216,181,0.14);color:#0a8f78">
+              <i class="fa-solid fa-arrow-up"></i> 3
+            </div>
           </div>
-          <div class="font-display text-[28px] font-bold leading-none mb-1">247</div>
-          <div class="text-[12px] uppercase tracking-[0.06em]" style="color:rgba(255,255,255,0.75)">Total Vehicles</div>
+          <div class="font-display text-[28px] font-bold leading-none mb-1 text-lb-700">247</div>
+          <div class="text-[12px] uppercase tracking-[0.06em] text-lb-500">Total Vehicles</div>
           <div class="mt-3 h-9"><canvas id="chart_vehicles"></canvas></div>
         </div>
 
-        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default"
-             style="background:rgba(8,16,30,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 32px rgba(0,0,0,0.28)">
+        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default">
           <div class="flex items-start justify-between mb-3.5">
-            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px]" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25)"><i class="fa-solid fa-road"></i></div>
-            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg" style="background:rgba(77,232,160,0.15);color:#4de8a0"><i class="fa-solid fa-arrow-up"></i> 5.3%</div>
+            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px] text-lb-600"
+                 style="background:rgba(56,175,249,0.14);border:1px solid rgba(56,175,249,0.25)">
+              <i class="fa-solid fa-road"></i>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg"
+                 style="background:rgba(52,216,181,0.14);color:#0a8f78">
+              <i class="fa-solid fa-arrow-up"></i> 5.3%
+            </div>
           </div>
-          <div class="font-display text-[28px] font-bold leading-none mb-1">142K</div>
-          <div class="text-[12px] uppercase tracking-[0.06em]" style="color:rgba(255,255,255,0.75)">Monthly km</div>
+          <div class="font-display text-[28px] font-bold leading-none mb-1 text-lb-700">142K</div>
+          <div class="text-[12px] uppercase tracking-[0.06em] text-lb-500">Monthly km</div>
           <div class="mt-3 h-9"><canvas id="chart_km"></canvas></div>
         </div>
 
-        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default"
-             style="background:rgba(8,16,30,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 32px rgba(0,0,0,0.28)">
+        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default">
           <div class="flex items-start justify-between mb-3.5">
-            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px]" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25)"><i class="fa-solid fa-gas-pump"></i></div>
-            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg" style="background:rgba(255,107,138,0.15);color:#ff6b8a"><i class="fa-solid fa-arrow-down"></i> 1.2%</div>
+            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px] text-lb-600"
+                 style="background:rgba(56,175,249,0.14);border:1px solid rgba(56,175,249,0.25)">
+              <i class="fa-solid fa-gas-pump"></i>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg"
+                 style="background:rgba(248,113,113,0.14);color:#b91c1c">
+              <i class="fa-solid fa-arrow-down"></i> 1.2%
+            </div>
           </div>
-          <div class="font-display text-[28px] font-bold leading-none mb-1">18.4</div>
-          <div class="text-[12px] uppercase tracking-[0.06em]" style="color:rgba(255,255,255,0.75)">Fuel km/L</div>
+          <div class="font-display text-[28px] font-bold leading-none mb-1 text-lb-700">96.4</div>
+          <div class="text-[12px] uppercase tracking-[0.06em] text-lb-500">Fleet Score</div>
           <div class="mt-3 h-9"><canvas id="chart_fuel_eff"></canvas></div>
         </div>
 
-        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default"
-             style="background:rgba(8,16,30,0.96);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 32px rgba(0,0,0,0.28)">
+        <div class="kpi-card rounded-[20px] p-5 transition-all duration-300 hover:-translate-y-1 cursor-default">
           <div class="flex items-start justify-between mb-3.5">
-            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px]" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25)"><i class="fa-solid fa-users"></i></div>
-            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg" style="background:rgba(77,232,160,0.15);color:#4de8a0"><i class="fa-solid fa-arrow-up"></i> 2</div>
+            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[17px] text-lb-600"
+                 style="background:rgba(56,175,249,0.14);border:1px solid rgba(56,175,249,0.25)">
+              <i class="fa-solid fa-gas-pump"></i>
+            </div>
+            <div class="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg"
+                 style="background:rgba(248,113,113,0.14);color:#b91c1c">
+              <i class="fa-solid fa-arrow-down"></i> 1.2%
+            </div>
           </div>
-          <div class="font-display text-[28px] font-bold leading-none mb-1">189</div>
-          <div class="text-[12px] uppercase tracking-[0.06em]" style="color:rgba(255,255,255,0.75)">Active Drivers</div>
+          <div class="font-display text-[28px] font-bold leading-none mb-1 text-lb-700">18.4</div>
+          <div class="text-[12px] uppercase tracking-[0.06em] text-lb-500">Fuel km/L</div>
           <div class="mt-3 h-9"><canvas id="chart_drivers"></canvas></div>
         </div>
+
       </div>
 
-      <!-- COMMAND CENTER + VEHICLE PANEL -->
+      <!-- MAP + VEHICLE PANEL -->
       <div class="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-5 mb-6">
 
-        <!-- MAP -->
-        <div class="map-container rounded-3xl overflow-hidden relative" style="background:rgba(8,16,30,0.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 14px 48px rgba(0,0,0,0.28)">
-          <div class="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-            <h3 class="text-[15px] font-semibold px-3.5 py-2 rounded-xl" style="background:rgba(8,16,30,0.92);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.14)">
+        <!-- MAP CARD — flex column so map fills all remaining height -->
+        <div class="map-container rounded-3xl overflow-hidden relative"
+             style="background:linear-gradient(145deg, rgba(218,241,255,0.9) 0%, rgba(186,226,253,0.85) 100%);backdrop-filter:blur(20px);border:1px solid rgba(56,175,249,0.28);box-shadow:0 12px 40px rgba(2,120,201,0.1)">
+
+          <!-- header bar — fixed height -->
+          <div class="flex items-center justify-between px-4 py-3 flex-shrink-0" style="border-bottom:1px solid rgba(56,175,249,0.15)">
+            <h3 class="text-[15px] font-semibold px-3 py-1.5 rounded-xl text-white"
+                style="background:rgba(7,81,134,0.82);backdrop-filter:blur(12px);border:1px solid rgba(56,175,249,0.25)">
               <i class="fa-solid fa-satellite-dish mr-2 opacity-70"></i>Live Command Center
             </h3>
             <div class="flex gap-2">
-              <button class="map-ctrl-btn px-3 py-1.5 rounded-[10px] text-[12px] font-medium text-white transition-all duration-200 active" onclick="toggleMapBtn(this)" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.25)">All</button>
-              <button class="map-ctrl-btn px-3 py-1.5 rounded-[10px] text-[12px] font-medium text-white transition-all duration-200" onclick="toggleMapBtn(this)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18)">Moving</button>
-              <button class="map-ctrl-btn px-3 py-1.5 rounded-[10px] text-[12px] font-medium text-white transition-all duration-200" onclick="toggleMapBtn(this)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18)">Idle</button>
-              <button class="map-ctrl-btn px-3 py-1.5 rounded-[10px] text-[12px] font-medium text-white transition-all duration-200" onclick="toggleMapBtn(this)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18)">Alert</button>
+              <button class="map-ctrl-btn px-3 py-1.5 rounded-[10px] text-[12px] font-medium text-lb-700 transition-all duration-200"
+                      onclick="toggleMapBtn(this);filterMap('All')"
+                      style="background:rgba(255,255,255,0.75);border:1px solid rgba(56,175,249,0.35)">All</button>
+              <button class="map-ctrl-btn px-3 py-1.5 rounded-[10px] text-[12px] font-medium text-lb-600 transition-all duration-200"
+                      onclick="toggleMapBtn(this);filterMap('Moving')"
+                      style="background:rgba(255,255,255,0.45);border:1px solid rgba(56,175,249,0.2)">Moving</button>
+              <button class="map-ctrl-btn px-3 py-1.5 rounded-[10px] text-[12px] font-medium text-lb-600 transition-all duration-200"
+                      onclick="toggleMapBtn(this);filterMap('Idle')"
+                      style="background:rgba(255,255,255,0.45);border:1px solid rgba(56,175,249,0.2)">Idle</button>
+              <button class="map-ctrl-btn px-3 py-1.5 rounded-[10px] text-[12px] font-medium text-lb-600 transition-all duration-200"
+                      onclick="toggleMapBtn(this);filterMap('Stopped')"
+                      style="background:rgba(255,255,255,0.45);border:1px solid rgba(56,175,249,0.2)">Alert</button>
             </div>
           </div>
-          <canvas id="mapCanvas"></canvas>
+
+          <!-- map fills the rest -->
+          <div id="osmMap"></div>
         </div>
 
         <!-- VEHICLE DETAIL PANEL -->
-        <div class="rounded-3xl p-5 overflow-y-auto" style="background:rgba(8,16,30,0.94);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,0.14);max-height:580px;box-shadow:0 14px 48px rgba(0,0,0,0.28)">
-          <div class="flex items-center gap-2 text-[14px] font-semibold mb-4">
-            <i class="fa-solid fa-truck-fast" style="color:rgba(255,255,255,0.6)"></i> Vehicle Details
+        <div class="rounded-3xl p-5 overflow-y-auto"
+             style="background:rgba(255,255,255,0.85);backdrop-filter:blur(22px);border:1px solid rgba(56,175,249,0.22);height:460px;box-shadow:0 12px 40px rgba(2,120,201,0.08)">
+          <div class="flex items-center gap-2 text-[14px] font-semibold mb-4 text-lb-700">
+            <i class="fa-solid fa-truck-fast text-lb-500"></i> Vehicle Details
           </div>
 
-          <!-- Selectors -->
           <div class="flex flex-col gap-2 mb-4">
-            <div class="veh-opt selected flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 text-[13px]"
-                 style="background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.3)"
+            <div class="veh-opt selected flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 text-[13px] text-lb-700"
+                 style="background:rgba(218,241,255,0.7);border:1px solid rgba(56,175,249,0.35)"
                  onclick="selectVehicle(this,'TN-01-AB-1234','Rajesh Kumar',72,68,'Good','98,420',312,'Chennai → Madurai','2h 14m','On Time')">
-              <i class="fa-solid fa-truck text-[14px]"></i>
+              <i class="fa-solid fa-truck text-[14px] text-lb-500"></i>
               <span class="font-semibold text-[13px]">TN-01-AB-1234</span>
-              <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-md" style="background:rgba(77,232,160,0.2);color:#4de8a0">Moving</span>
+              <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-md badge-moving">Moving</span>
             </div>
-            <div class="veh-opt flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 text-[13px]"
-                 style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15)"
+            <div class="veh-opt flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 text-[13px] text-lb-600"
+                 style="background:rgba(240,248,255,0.6);border:1px solid rgba(56,175,249,0.15)"
                  onclick="selectVehicle(this,'TN-02-CD-5678','Suresh Nair',45,0,'Check','76,180',0,'Depot','—','Idle')">
-              <i class="fa-solid fa-van-shuttle text-[14px]"></i>
+              <i class="fa-solid fa-van-shuttle text-[14px] text-lb-400"></i>
               <span class="font-semibold text-[13px]">TN-02-CD-5678</span>
-              <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-md" style="background:rgba(255,209,102,0.2);color:#ffd166">Idle</span>
+              <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-md badge-idle">Idle</span>
             </div>
-            <div class="veh-opt flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 text-[13px]"
-                 style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15)"
+            <div class="veh-opt flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 text-[13px] text-lb-600"
+                 style="background:rgba(240,248,255,0.6);border:1px solid rgba(56,175,249,0.15)"
                  onclick="selectVehicle(this,'TN-03-EF-9012','Priya Mehta',88,55,'Excellent','1,24,860',418,'Coimbatore → Salem','3h 40m','On Time')">
-              <i class="fa-solid fa-car text-[14px]"></i>
+              <i class="fa-solid fa-car text-[14px] text-lb-400"></i>
               <span class="font-semibold text-[13px]">TN-03-EF-9012</span>
-              <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-md" style="background:rgba(77,232,160,0.2);color:#4de8a0">Moving</span>
+              <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-md badge-moving">Moving</span>
             </div>
-            <div class="veh-opt flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 text-[13px]"
-                 style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15)"
+            <div class="veh-opt flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 text-[13px] text-lb-600"
+                 style="background:rgba(240,248,255,0.6);border:1px solid rgba(56,175,249,0.15)"
                  onclick="selectVehicle(this,'TN-04-GH-3456','Amit Singh',18,0,'Service Due','55,340',0,'Garage','—','Stopped')">
-              <i class="fa-solid fa-truck text-[14px]"></i>
+              <i class="fa-solid fa-truck text-[14px] text-lb-400"></i>
               <span class="font-semibold text-[13px]">TN-04-GH-3456</span>
-              <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-md" style="background:rgba(255,107,138,0.2);color:#ff6b8a">Stopped</span>
+              <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-md badge-stopped">Stopped</span>
             </div>
           </div>
 
-          <div id="vehDetailInfo" class="flex flex-col gap-2.5"></div>
+          <div id="vehDetailInfo" class="flex flex-col gap-2"></div>
         </div>
       </div>
 
       <!-- ANALYTICS CHARTS 2×2 -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-        <div class="glass-card rounded-[22px] p-5 transition-all duration-300" style="background:rgba(8,16,30,0.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 36px rgba(0,0,0,0.26)">
+
+        <div class="glass-card rounded-[22px] p-5 transition-all duration-300"
+             style="background:rgba(255,255,255,0.85)!important;border:1px solid rgba(56,175,249,0.2)!important;box-shadow:0 8px 28px rgba(2,120,201,0.07)!important">
           <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2 text-[14px] font-semibold"><i class="fa-solid fa-chart-area" style="color:rgba(255,255,255,0.6)"></i> Fuel Consumption Trend</div>
-            <div class="text-[11px] cursor-pointer hover:text-white transition-colors" style="color:rgba(255,255,255,0.75)">This Month ▾</div>
+            <div class="flex items-center gap-2 text-[14px] font-semibold text-lb-700">
+              <i class="fa-solid fa-chart-area text-lb-400"></i> Fuel Consumption Trend
+            </div>
+            <div class="text-[11px] cursor-pointer hover:underline text-lb-500">This Month ▾</div>
           </div>
           <div class="relative h-[200px]"><canvas id="fuelChart"></canvas></div>
         </div>
-        <div class="glass-card rounded-[22px] p-5 transition-all duration-300" style="background:rgba(8,16,30,0.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 36px rgba(0,0,0,0.26)">
+
+        <div class="glass-card rounded-[22px] p-5 transition-all duration-300"
+             style="background:rgba(255,255,255,0.85)!important;border:1px solid rgba(56,175,249,0.2)!important;box-shadow:0 8px 28px rgba(2,120,201,0.07)!important">
           <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2 text-[14px] font-semibold"><i class="fa-solid fa-chart-bar" style="color:rgba(255,255,255,0.6)"></i> Fleet Utilization</div>
-            <div class="text-[11px] cursor-pointer hover:text-white transition-colors" style="color:rgba(255,255,255,0.75)">Weekly ▾</div>
+            <div class="flex items-center gap-2 text-[14px] font-semibold text-lb-700">
+              <i class="fa-solid fa-chart-bar text-lb-400"></i> Fleet Utilization
+            </div>
+            <div class="text-[11px] cursor-pointer hover:underline text-lb-500">Weekly ▾</div>
           </div>
           <div class="relative h-[200px]"><canvas id="utilizationChart"></canvas></div>
         </div>
-        <div class="glass-card rounded-[22px] p-5 transition-all duration-300" style="background:rgba(8,16,30,0.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 36px rgba(0,0,0,0.26)">
+
+        <div class="glass-card rounded-[22px] p-5 transition-all duration-300"
+             style="background:rgba(255,255,255,0.85)!important;border:1px solid rgba(56,175,249,0.2)!important;box-shadow:0 8px 28px rgba(2,120,201,0.07)!important">
           <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2 text-[14px] font-semibold"><i class="fa-solid fa-user-check" style="color:rgba(255,255,255,0.6)"></i> Driver Performance</div>
-            <div class="text-[11px] cursor-pointer hover:text-white transition-colors" style="color:rgba(255,255,255,0.75)">View All ▾</div>
+            <div class="flex items-center gap-2 text-[14px] font-semibold text-lb-700">
+              <i class="fa-solid fa-user-check text-lb-400"></i> Driver Performance
+            </div>
+            <div class="text-[11px] cursor-pointer hover:underline text-lb-500">View All ▾</div>
           </div>
           <div class="relative h-[200px]"><canvas id="driverChart"></canvas></div>
         </div>
-        <div class="glass-card rounded-[22px] p-5 transition-all duration-300" style="background:rgba(8,16,30,0.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 36px rgba(0,0,0,0.26)">
+
+        <div class="glass-card rounded-[22px] p-5 transition-all duration-300"
+             style="background:rgba(255,255,255,0.85)!important;border:1px solid rgba(56,175,249,0.2)!important;box-shadow:0 8px 28px rgba(2,120,201,0.07)!important">
           <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2 text-[14px] font-semibold"><i class="fa-solid fa-chart-line" style="color:rgba(255,255,255,0.6)"></i> Monthly Distance</div>
-            <div class="text-[11px] cursor-pointer hover:text-white transition-colors" style="color:rgba(255,255,255,0.75)">6 Months ▾</div>
+            <div class="flex items-center gap-2 text-[14px] font-semibold text-lb-700">
+              <i class="fa-solid fa-chart-line text-lb-400"></i> Monthly Distance
+            </div>
+            <div class="text-[11px] cursor-pointer hover:underline text-lb-500">6 Months ▾</div>
           </div>
           <div class="relative h-[200px]"><canvas id="distanceChart"></canvas></div>
         </div>
       </div>
 
-      <!-- BOTTOM ROW: Timeline + Alerts + Health Ring -->
+      <!-- BOTTOM ROW -->
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
 
-        <!-- TIMELINE -->
-        <div class="glass-card rounded-[22px] p-5 transition-all duration-300" style="background:rgba(8,16,30,0.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 36px rgba(0,0,0,0.26)">
+        <div class="glass-card rounded-[22px] p-5 transition-all duration-300"
+             style="background:rgba(255,255,255,0.85)!important;border:1px solid rgba(56,175,249,0.2)!important;box-shadow:0 8px 28px rgba(2,120,201,0.07)!important">
           <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2 text-[14px] font-semibold"><i class="fa-solid fa-clock-rotate-left" style="color:rgba(255,255,255,0.6)"></i> Activity Timeline</div>
-            <div class="text-[11px] cursor-pointer hover:text-white" style="color:rgba(255,255,255,0.75)">View All</div>
+            <div class="flex items-center gap-2 text-[14px] font-semibold text-lb-700">
+              <i class="fa-solid fa-clock-rotate-left text-lb-400"></i> Activity Timeline
+            </div>
+            <div class="text-[11px] cursor-pointer hover:underline text-lb-500">View All</div>
           </div>
           <div class="flex flex-col">
-            <!-- TL items -->
             <div class="tl-item flex items-start gap-3 py-3 relative">
-              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]" style="background:rgba(77,232,160,0.2);color:#4de8a0;border:2px solid rgba(255,255,255,0.2)"><i class="fa-solid fa-play"></i></div>
-              <div class="flex-1">
-                <div class="text-[13px] font-semibold mb-0.5">Trip Started</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-01-AB-1234 · Chennai → Madurai</div>
+              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]"
+                   style="background:rgba(52,216,181,0.15);color:#0a8f78;border:1.5px solid rgba(52,216,181,0.3)">
+                <i class="fa-solid fa-play"></i>
               </div>
-              <div class="text-[11px] whitespace-nowrap" style="color:rgba(255,255,255,0.5)">9:42 AM</div>
+              <div class="flex-1">
+                <div class="text-[13px] font-semibold mb-0.5 text-lb-800">Trip Started</div>
+                <div class="text-[11px] text-lb-500">TN-01-AB-1234 · Chennai → Madurai</div>
+              </div>
+              <div class="text-[11px] whitespace-nowrap text-lb-400">9:42 AM</div>
             </div>
             <div class="tl-item flex items-start gap-3 py-3 relative">
-              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]" style="background:rgba(255,209,102,0.2);color:#ffd166;border:2px solid rgba(255,255,255,0.2)"><i class="fa-solid fa-gas-pump"></i></div>
-              <div class="flex-1">
-                <div class="text-[13px] font-semibold mb-0.5">Fuel Refill</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-03-EF-9012 · 58L at ₹6,032</div>
+              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]"
+                   style="background:rgba(251,191,36,0.15);color:#92650a;border:1.5px solid rgba(251,191,36,0.3)">
+                <i class="fa-solid fa-gas-pump"></i>
               </div>
-              <div class="text-[11px] whitespace-nowrap" style="color:rgba(255,255,255,0.5)">9:20 AM</div>
+              <div class="flex-1">
+                <div class="text-[13px] font-semibold mb-0.5 text-lb-800">Fuel Refill</div>
+                <div class="text-[11px] text-lb-500">TN-03-EF-9012 · 58L at ₹6,032</div>
+              </div>
+              <div class="text-[11px] whitespace-nowrap text-lb-400">9:20 AM</div>
             </div>
             <div class="tl-item flex items-start gap-3 py-3 relative">
-              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]" style="background:rgba(130,210,255,0.2);color:#82d2ff;border:2px solid rgba(255,255,255,0.2)"><i class="fa-solid fa-flag-checkered"></i></div>
-              <div class="flex-1">
-                <div class="text-[13px] font-semibold mb-0.5">Trip Completed</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-07-XY-7890 · 312 km in 4h 18m</div>
+              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]"
+                   style="background:rgba(56,175,249,0.15);color:#0278c9;border:1.5px solid rgba(56,175,249,0.3)">
+                <i class="fa-solid fa-flag-checkered"></i>
               </div>
-              <div class="text-[11px] whitespace-nowrap" style="color:rgba(255,255,255,0.5)">8:55 AM</div>
+              <div class="flex-1">
+                <div class="text-[13px] font-semibold mb-0.5 text-lb-800">Trip Completed</div>
+                <div class="text-[11px] text-lb-500">TN-07-XY-7890 · 312 km in 4h 18m</div>
+              </div>
+              <div class="text-[11px] whitespace-nowrap text-lb-400">8:55 AM</div>
             </div>
             <div class="tl-item flex items-start gap-3 py-3 relative">
-              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]" style="background:rgba(200,165,255,0.2);color:#c8a5ff;border:2px solid rgba(255,255,255,0.2)"><i class="fa-solid fa-wrench"></i></div>
-              <div class="flex-1">
-                <div class="text-[13px] font-semibold mb-0.5">Maintenance Done</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-05-KL-2345 · Oil change & filter</div>
+              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]"
+                   style="background:rgba(125,203,252,0.2);color:#0360a3;border:1.5px solid rgba(56,175,249,0.2)">
+                <i class="fa-solid fa-wrench"></i>
               </div>
-              <div class="text-[11px] whitespace-nowrap" style="color:rgba(255,255,255,0.5)">7:30 AM</div>
+              <div class="flex-1">
+                <div class="text-[13px] font-semibold mb-0.5 text-lb-800">Maintenance Done</div>
+                <div class="text-[11px] text-lb-500">TN-05-KL-2345 · Oil change & filter</div>
+              </div>
+              <div class="text-[11px] whitespace-nowrap text-lb-400">7:30 AM</div>
             </div>
             <div class="tl-item flex items-start gap-3 py-3 relative">
-              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]" style="background:rgba(255,107,138,0.2);color:#ff6b8a;border:2px solid rgba(255,255,255,0.2)"><i class="fa-solid fa-triangle-exclamation"></i></div>
-              <div class="flex-1">
-                <div class="text-[13px] font-semibold mb-0.5">Alert Triggered</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-04-GH-3456 · Geofence breach</div>
+              <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px]"
+                   style="background:rgba(248,113,113,0.15);color:#b91c1c;border:1.5px solid rgba(248,113,113,0.25)">
+                <i class="fa-solid fa-triangle-exclamation"></i>
               </div>
-              <div class="text-[11px] whitespace-nowrap" style="color:rgba(255,255,255,0.5)">6:58 AM</div>
+              <div class="flex-1">
+                <div class="text-[13px] font-semibold mb-0.5 text-lb-800">Alert Triggered</div>
+                <div class="text-[11px] text-lb-500">TN-04-GH-3456 · Geofence breach</div>
+              </div>
+              <div class="text-[11px] whitespace-nowrap text-lb-400">6:58 AM</div>
             </div>
           </div>
         </div>
 
-        <!-- ALERTS -->
-        <div class="glass-card rounded-[22px] p-5 transition-all duration-300" style="background:rgba(8,16,30,0.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 36px rgba(0,0,0,0.26)">
+        <div class="glass-card rounded-[22px] p-5 transition-all duration-300"
+             style="background:rgba(255,255,255,0.85)!important;border:1px solid rgba(56,175,249,0.2)!important;box-shadow:0 8px 28px rgba(2,120,201,0.07)!important">
           <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2 text-[14px] font-semibold"><i class="fa-solid fa-triangle-exclamation" style="color:rgba(255,255,255,0.6)"></i> Alert Center</div>
-            <div class="text-[11px] cursor-pointer hover:text-white" style="color:rgba(255,255,255,0.75)">Mark All Read</div>
+            <div class="flex items-center gap-2 text-[14px] font-semibold text-lb-700">
+              <i class="fa-solid fa-triangle-exclamation text-lb-400"></i> Alert Center
+            </div>
+            <div class="text-[11px] cursor-pointer hover:underline text-lb-500">Mark All Read</div>
           </div>
           <div class="flex flex-col gap-2.5">
-            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12)">
-              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]" style="background:rgba(255,107,138,0.2);color:#ff6b8a"><i class="fa-solid fa-gas-pump"></i></div>
+            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200"
+                 style="background:rgba(240,248,255,0.7);border:1px solid rgba(56,175,249,0.15)">
+              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]"
+                   style="background:rgba(248,113,113,0.12);color:#b91c1c"><i class="fa-solid fa-gas-pump"></i></div>
               <div class="flex-1">
-                <div class="text-[12px] font-semibold mb-0.5">Low Fuel Alert</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-04-GH-3456 · 18% remaining</div>
+                <div class="text-[12px] font-semibold mb-0.5 text-lb-800">Low Fuel Alert</div>
+                <div class="text-[11px] text-lb-500">TN-04-GH-3456 · 18% remaining</div>
               </div>
-              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#ff6b8a;box-shadow:0 0 6px #ff6b8a"></div>
-              <div class="text-[10px]" style="color:rgba(255,255,255,0.5)">5m ago</div>
+              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#f87171;box-shadow:0 0 6px rgba(248,113,113,0.6)"></div>
+              <div class="text-[10px] text-lb-400">5m ago</div>
             </div>
-            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12)">
-              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]" style="background:rgba(255,209,102,0.2);color:#ffd166"><i class="fa-solid fa-gauge-high"></i></div>
+            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200"
+                 style="background:rgba(240,248,255,0.7);border:1px solid rgba(56,175,249,0.15)">
+              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]"
+                   style="background:rgba(251,191,36,0.12);color:#92650a"><i class="fa-solid fa-gauge-high"></i></div>
               <div class="flex-1">
-                <div class="text-[12px] font-semibold mb-0.5">Overspeed Alert</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-02-CD-5678 · 94 km/h in 60 zone</div>
+                <div class="text-[12px] font-semibold mb-0.5 text-lb-800">Overspeed Alert</div>
+                <div class="text-[11px] text-lb-500">TN-02-CD-5678 · 94 km/h in 60 zone</div>
               </div>
-              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#ffd166;box-shadow:0 0 6px #ffd166"></div>
-              <div class="text-[10px]" style="color:rgba(255,255,255,0.5)">12m ago</div>
+              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#fbbf24;box-shadow:0 0 6px rgba(251,191,36,0.6)"></div>
+              <div class="text-[10px] text-lb-400">12m ago</div>
             </div>
-            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12)">
-              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]" style="background:rgba(255,209,102,0.2);color:#ffd166"><i class="fa-solid fa-wrench"></i></div>
+            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200"
+                 style="background:rgba(240,248,255,0.7);border:1px solid rgba(56,175,249,0.15)">
+              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]"
+                   style="background:rgba(251,191,36,0.12);color:#92650a"><i class="fa-solid fa-wrench"></i></div>
               <div class="flex-1">
-                <div class="text-[12px] font-semibold mb-0.5">Maintenance Due</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-06-MN-4567 · Service in 200 km</div>
+                <div class="text-[12px] font-semibold mb-0.5 text-lb-800">Maintenance Due</div>
+                <div class="text-[11px] text-lb-500">TN-06-MN-4567 · Service in 200 km</div>
               </div>
-              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#ffd166;box-shadow:0 0 6px #ffd166"></div>
-              <div class="text-[10px]" style="color:rgba(255,255,255,0.5)">1h ago</div>
+              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#fbbf24;box-shadow:0 0 6px rgba(251,191,36,0.5)"></div>
+              <div class="text-[10px] text-lb-400">1h ago</div>
             </div>
-            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12)">
-              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]" style="background:rgba(255,107,138,0.2);color:#ff6b8a"><i class="fa-solid fa-map-location-dot"></i></div>
+            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200"
+                 style="background:rgba(240,248,255,0.7);border:1px solid rgba(56,175,249,0.15)">
+              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]"
+                   style="background:rgba(248,113,113,0.12);color:#b91c1c"><i class="fa-solid fa-map-location-dot"></i></div>
               <div class="flex-1">
-                <div class="text-[12px] font-semibold mb-0.5">Geofence Breach</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-04-GH-3456 · Left Zone A</div>
+                <div class="text-[12px] font-semibold mb-0.5 text-lb-800">Geofence Breach</div>
+                <div class="text-[11px] text-lb-500">TN-04-GH-3456 · Left Zone A</div>
               </div>
-              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#ff6b8a;box-shadow:0 0 6px #ff6b8a"></div>
-              <div class="text-[10px]" style="color:rgba(255,255,255,0.5)">2h ago</div>
+              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#f87171;box-shadow:0 0 6px rgba(248,113,113,0.6)"></div>
+              <div class="text-[10px] text-lb-400">2h ago</div>
             </div>
-            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12)">
-              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]" style="background:rgba(130,210,255,0.2);color:#82d2ff"><i class="fa-solid fa-battery-quarter"></i></div>
+            <div class="alert-item flex items-center gap-3 p-3 rounded-[14px] cursor-pointer transition-all duration-200"
+                 style="background:rgba(240,248,255,0.7);border:1px solid rgba(56,175,249,0.15)">
+              <div class="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center text-[14px]"
+                   style="background:rgba(56,175,249,0.12);color:#0278c9"><i class="fa-solid fa-battery-quarter"></i></div>
               <div class="flex-1">
-                <div class="text-[12px] font-semibold mb-0.5">Battery Low</div>
-                <div class="text-[11px]" style="color:rgba(255,255,255,0.5)">TN-09-ST-0011 · GPS battery 12%</div>
+                <div class="text-[12px] font-semibold mb-0.5 text-lb-800">Battery Low</div>
+                <div class="text-[11px] text-lb-500">TN-09-ST-0011 · GPS battery 12%</div>
               </div>
-              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#82d2ff;box-shadow:0 0 6px #82d2ff"></div>
-              <div class="text-[10px]" style="color:rgba(255,255,255,0.5)">3h ago</div>
+              <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:#38aff9;box-shadow:0 0 6px rgba(56,175,249,0.6)"></div>
+              <div class="text-[10px] text-lb-400">3h ago</div>
             </div>
           </div>
         </div>
 
-        <!-- FLEET HEALTH RING -->
         <div class="glass-card rounded-[22px] p-5 flex flex-col items-center justify-center gap-5 transition-all duration-300"
-             style="background:rgba(8,16,30,0.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 36px rgba(0,0,0,0.26)">
-          <div class="flex items-center gap-2 text-[14px] font-semibold self-start">
-            <i class="fa-solid fa-heart-pulse" style="color:rgba(255,255,255,0.6)"></i> Fleet Health
+             style="background:rgba(255,255,255,0.85)!important;border:1px solid rgba(56,175,249,0.2)!important;box-shadow:0 8px 28px rgba(2,120,201,0.07)!important">
+          <div class="flex items-center gap-2 text-[14px] font-semibold self-start text-lb-700">
+            <i class="fa-solid fa-heart-pulse text-lb-400"></i> Fleet Health
           </div>
           <div class="text-center">
             <div class="health-ring">
               <svg width="120" height="120" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="10"/>
-                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="10"
+                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(186,226,253,0.5)" stroke-width="10"/>
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#38aff9" stroke-width="10"
                         stroke-dasharray="327" stroke-dashoffset="24" stroke-linecap="round"
-                        style="filter:drop-shadow(0 0 8px rgba(255,255,255,0.5))"/>
+                        style="filter:drop-shadow(0 0 6px rgba(56,175,249,0.4))"/>
               </svg>
               <div class="ring-val">96%</div>
             </div>
-            <span class="block text-[10px] uppercase tracking-widest mt-1.5" style="color:rgba(255,255,255,0.5)">Overall Score</span>
+            <span class="block text-[10px] uppercase tracking-widest mt-1.5 text-lb-400">Overall Score</span>
           </div>
           <div class="w-full flex flex-col gap-2.5">
             <div>
-              <div class="flex justify-between text-[11px] mb-1.5" style="color:rgba(255,255,255,0.6)"><span>Engine Health</span><span>98%</span></div>
-              <div class="fuel-bar-bg"><div class="fuel-bar-fill" style="width:98%;background:linear-gradient(90deg,#4de8a0,#82e8c0)"></div></div>
+              <div class="flex justify-between text-[11px] mb-1.5 text-lb-600"><span>Engine Health</span><span class="font-semibold">98%</span></div>
+              <div class="fuel-bar-bg"><div class="fuel-bar-fill" style="width:98%;background:linear-gradient(90deg,#34d8b5,#7ae8d4)"></div></div>
             </div>
             <div>
-              <div class="flex justify-between text-[11px] mb-1.5" style="color:rgba(255,255,255,0.6)"><span>Tyre Condition</span><span>91%</span></div>
-              <div class="fuel-bar-bg"><div class="fuel-bar-fill" style="width:91%;background:linear-gradient(90deg,#74c6e8,#a8ddf5)"></div></div>
+              <div class="flex justify-between text-[11px] mb-1.5 text-lb-600"><span>Tyre Condition</span><span class="font-semibold">91%</span></div>
+              <div class="fuel-bar-bg"><div class="fuel-bar-fill" style="width:91%;background:linear-gradient(90deg,#38aff9,#7dcbfc)"></div></div>
             </div>
             <div>
-              <div class="flex justify-between text-[11px] mb-1.5" style="color:rgba(255,255,255,0.6)"><span>Brake System</span><span>95%</span></div>
-              <div class="fuel-bar-bg"><div class="fuel-bar-fill" style="width:95%;background:linear-gradient(90deg,#74c6e8,#c8ecf8)"></div></div>
+              <div class="flex justify-between text-[11px] mb-1.5 text-lb-600"><span>Brake System</span><span class="font-semibold">95%</span></div>
+              <div class="fuel-bar-bg"><div class="fuel-bar-fill" style="width:95%;background:linear-gradient(90deg,#0e96eb,#38aff9)"></div></div>
             </div>
             <div>
-              <div class="flex justify-between text-[11px] mb-1.5" style="color:rgba(255,255,255,0.6)"><span>Fuel System</span><span>87%</span></div>
-              <div class="fuel-bar-bg"><div class="fuel-bar-fill" style="width:87%;background:linear-gradient(90deg,#ffd166,#ffe0a3)"></div></div>
+              <div class="flex justify-between text-[11px] mb-1.5 text-lb-600"><span>Fuel System</span><span class="font-semibold">87%</span></div>
+              <div class="fuel-bar-bg"><div class="fuel-bar-fill" style="width:87%;background:linear-gradient(90deg,#fbbf24,#fde68a)"></div></div>
             </div>
           </div>
         </div>
-      </div>
 
-    </div><!-- end page-content -->
-  </div><!-- end main -->
-</div><!-- end dashboard -->
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 // ======= AUTH =======
@@ -717,130 +911,128 @@ function signIn() {
   if (!email || !pass) { alert('Please enter credentials.'); return; }
   const login = document.getElementById('loginPage');
   const dash  = document.getElementById('dashboard');
-  login.style.opacity = '0'; login.style.transform = 'scale(1.02)'; login.style.transition = 'all 0.5s ease';
+  login.style.opacity='0'; login.style.transform='scale(1.02)'; login.style.transition='all 0.5s ease';
   setTimeout(() => {
-    login.style.display = 'none';
+    login.style.display='none';
     dash.classList.add('active');
-    dash.style.opacity = '0'; dash.style.transition = 'opacity 0.5s ease';
-    setTimeout(() => { dash.style.opacity = '1'; }, 50);
+    dash.style.opacity='0'; dash.style.transition='opacity 0.5s ease';
+    setTimeout(() => { dash.style.opacity='1'; }, 50);
     initDashboard();
   }, 500);
 }
 function logout() {
   const login = document.getElementById('loginPage');
   const dash  = document.getElementById('dashboard');
-  dash.style.opacity = '0'; dash.style.transition = 'opacity 0.4s ease';
+  dash.style.opacity='0'; dash.style.transition='opacity 0.4s ease';
   setTimeout(() => {
     dash.classList.remove('active');
-    login.style.display = 'flex'; login.style.opacity = '0'; login.style.transform = 'scale(0.98)'; login.style.transition = 'all 0.5s ease';
-    setTimeout(() => { login.style.opacity = '1'; login.style.transform = 'scale(1)'; }, 50);
+    login.style.display='flex'; login.style.opacity='0'; login.style.transform='scale(0.98)'; login.style.transition='all 0.5s ease';
+    setTimeout(() => { login.style.opacity='1'; login.style.transform='scale(1)'; }, 50);
   }, 400);
 }
 
-// ======= SIDEBAR =======
 function setActive(el) {
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
 }
 
-// ======= MAP CTRL =======
 function toggleMapBtn(btn) {
-  document.querySelectorAll('.map-ctrl-btn').forEach(b => {
-    b.style.background = 'rgba(255,255,255,0.15)';
-  });
-  btn.style.background = 'rgba(255,255,255,0.28)';
+  document.querySelectorAll('.map-ctrl-btn').forEach(b => { b.style.background='rgba(255,255,255,0.45)'; });
+  btn.style.background='rgba(255,255,255,0.78)';
 }
 
-// ======= LIVE TIME =======
 function updateTime() {
   const el = document.getElementById('liveTime');
-  if (el) el.textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' }) + ' · ' + new Date().toLocaleTimeString('en-IN');
+  if (el) el.textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + ' · ' + new Date().toLocaleTimeString('en-IN');
 }
 setInterval(updateTime, 1000); updateTime();
 
-// ======= MAP CANVAS =======
-function drawMap() {
-  const canvas = document.getElementById('mapCanvas');
-  if (!canvas) return;
-  const W = canvas.parentElement.offsetWidth || 700;
-  const H = 420;
-  canvas.width = W; canvas.height = H;
-  canvas.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
+// ======= OSM MAP =======
+let osmMap = null;
+let osmMarkers = [];
 
-  const bg = ctx.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0, 'rgba(80,180,220,0.3)'); bg.addColorStop(1, 'rgba(120,210,245,0.15)');
-  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+const VEHICLES = [
+  { lat: 10.7905, lng: 79.1378, color: '#34d8b5', ring: 'rgba(52,216,181,0.35)', label: 'AB-1234', status: 'Moving',  plate: 'TN-01-AB-1234' },
+  { lat: 11.0168, lng: 76.9558, color: '#0e96eb', ring: 'rgba(14,150,235,0.35)', label: 'EF-9012', status: 'Moving',  plate: 'TN-03-EF-9012' },
+  { lat: 13.0827, lng: 80.2707, color: '#fbbf24', ring: 'rgba(251,191,36,0.35)', label: 'CD-5678', status: 'Idle',    plate: 'TN-02-CD-5678' },
+  { lat: 9.9252,  lng: 78.1198, color: '#f87171', ring: 'rgba(248,113,113,0.35)',label: 'GH-3456', status: 'Stopped', plate: 'TN-04-GH-3456' },
+];
 
-  ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1;
-  for (let x=0; x<W; x+=48) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for (let y=0; y<H; y+=48) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+const ROUTES = [
+  { coords: [[10.7905,79.1378],[11.0168,76.9558]], color: '#34d8b5' },
+  { coords: [[13.0827,80.2707],[11.0168,76.9558]], color: '#0e96eb' },
+];
 
-  const roads = [
-    [[60,H],[80,H-80],[160,H-120],[280,H-100],[380,H-160],[480,H-120],[W-60,H-80]],
-    [[0,H/2],[120,H/2-40],[240,H/2+20],[360,H/2-30],[480,H/2+10],[W,H/2]],
-    [[W/2,0],[W/2+20,80],[W/2-30,180],[W/2+10,300],[W/2,H]],
-  ];
-  roads.forEach(pts => {
-    ctx.strokeStyle = 'rgba(255,255,255,0.14)'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
-    for (let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]);
-    ctx.stroke();
-  });
-
-  ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1.5; ctx.setLineDash([6,4]);
-  ctx.beginPath(); ctx.arc(W*0.45,H*0.5,100,0,Math.PI*2); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.font='10px Inter,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)';
-  ctx.fillText('ZONE A',W*0.45-14,H*0.5-106);
-
-  const routes = [
-    {pts:[[80,H-80],[160,H-120],[280,H-100],[380,H-160]],color:'rgba(77,232,160,0.7)'},
-    {pts:[[W/2,80],[W/2-30,180],[360,H/2-30]],color:'rgba(130,210,255,0.7)'},
-  ];
-  routes.forEach(r => {
-    ctx.strokeStyle=r.color; ctx.lineWidth=2.5; ctx.setLineDash([8,5]);
-    ctx.beginPath(); ctx.moveTo(r.pts[0][0],r.pts[0][1]);
-    for(let i=1;i<r.pts.length;i++) ctx.lineTo(r.pts[i][0],r.pts[i][1]);
-    ctx.stroke(); ctx.setLineDash([]);
-  });
-
-  const vehicles=[
-    {x:320,y:H-108,color:'#4de8a0',label:'AB-1234'},
-    {x:W/2-10,y:200,color:'#82d2ff',label:'EF-9012'},
-    {x:150,y:H/2+20,color:'#ffd166',label:'CD-5678'},
-    {x:W-120,y:H/2-20,color:'#ff6b8a',label:'GH-3456'},
-  ];
-  vehicles.forEach(v => {
-    ctx.strokeStyle=v.color+'55'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.arc(v.x,v.y,20,0,Math.PI*2); ctx.stroke();
-    ctx.fillStyle=v.color; ctx.shadowColor=v.color; ctx.shadowBlur=12;
-    ctx.beginPath(); ctx.arc(v.x,v.y,8,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-    ctx.fillStyle='rgba(0,0,0,0.45)';
-    const tw=ctx.measureText(v.label).width;
-    rrect(ctx,v.x-tw/2-6,v.y-30,tw+12,18,5); ctx.fill();
-    ctx.fillStyle='white'; ctx.font='bold 10px Inter,sans-serif'; ctx.textAlign='center';
-    ctx.fillText(v.label,v.x,v.y-17); ctx.textAlign='left';
-  });
+function makeVehicleIcon(v) {
+  const html = `
+    <div style="position:relative;width:36px;height:36px">
+      <div style="position:absolute;inset:0;border-radius:50%;background:${v.ring};animation:veh-pulse-anim 2s ease-out infinite"></div>
+      <div style="position:absolute;inset:4px;border-radius:50%;background:${v.color};box-shadow:0 0 8px ${v.color}88;display:flex;align-items:center;justify-content:center">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-8 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+      </div>
+      <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(7,81,134,0.88);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;font-family:Inter,sans-serif">${v.label}</div>
+    </div>`;
+  return L.divIcon({ html, className: '', iconSize: [36,36], iconAnchor: [18,18] });
 }
-function rrect(ctx,x,y,w,h,r){
-  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
-  ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
-  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
-  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
-  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+
+function initOsmMap() {
+  if (osmMap) { osmMap.remove(); osmMap = null; osmMarkers = []; }
+
+  osmMap = L.map('osmMap', { center: [11.5, 78.5], zoom: 7, zoomControl: true, attributionControl: true });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  }).addTo(osmMap);
+
+  ROUTES.forEach(r => {
+    L.polyline(r.coords, { color: r.color, weight: 3, opacity: 0.85, dashArray: '8 5' }).addTo(osmMap);
+  });
+
+  L.circle([13.0827, 80.2707], {
+    radius: 25000, color: '#38aff9', weight: 1.5, dashArray: '6 4',
+    fillColor: '#38aff9', fillOpacity: 0.06,
+  }).addTo(osmMap).bindTooltip('ZONE A', { permanent: true, direction: 'top', className: 'zone-label' });
+
+  VEHICLES.forEach(v => {
+    const m = L.marker([v.lat, v.lng], { icon: makeVehicleIcon(v) })
+      .addTo(osmMap)
+      .bindPopup(`
+        <div style="font-family:Inter,sans-serif;min-width:160px">
+          <div style="font-weight:700;font-size:13px;color:#075186;margin-bottom:6px">${v.plate}</div>
+          <div style="font-size:12px;color:#0360a3;display:flex;justify-content:space-between">
+            <span>Status</span>
+            <span style="font-weight:600;color:${v.color}">${v.status}</span>
+          </div>
+        </div>
+      `, { maxWidth: 200 });
+    osmMarkers.push({ marker: m, vehicle: v });
+  });
+
+  // invalidate size after a tick to ensure the flex container has settled
+  setTimeout(() => osmMap.invalidateSize(), 100);
+}
+
+function filterMap(status) {
+  if (!osmMap) return;
+  osmMarkers.forEach(({ marker, vehicle }) => {
+    if (status === 'All' || vehicle.status === status) {
+      if (!osmMap.hasLayer(marker)) marker.addTo(osmMap);
+    } else {
+      if (osmMap.hasLayer(marker)) osmMap.removeLayer(marker);
+    }
+  });
 }
 
 // ======= VEHICLE DETAIL =======
 function selectVehicle(el,num,driver,fuel,speed,engine,odo,dist,route,eta,maint){
   document.querySelectorAll('.veh-opt').forEach(o=>{
     o.classList.remove('selected');
-    o.style.background='rgba(255,255,255,0.08)'; o.style.borderColor='rgba(255,255,255,0.15)';
+    o.style.background='rgba(240,248,255,0.6)'; o.style.borderColor='rgba(56,175,249,0.15)';
   });
   el.classList.add('selected');
-  el.style.background='rgba(255,255,255,0.18)'; el.style.borderColor='rgba(255,255,255,0.35)';
-  const fc=fuel<25?'#ff6b8a':fuel<50?'#ffd166':'#4de8a0';
+  el.style.background='rgba(218,241,255,0.7)'; el.style.borderColor='rgba(56,175,249,0.35)';
+  const fc=fuel<25?'#f87171':fuel<50?'#fbbf24':'#34d8b5';
   document.getElementById('vehDetailInfo').innerHTML=`
     ${row('fa-hashtag','Vehicle No.',num)}
     ${row('fa-user','Driver',driver)}
@@ -851,60 +1043,57 @@ function selectVehicle(el,num,driver,fuel,speed,engine,odo,dist,route,eta,maint)
     ${row('fa-clock','Est. Arrival',eta)}
     ${row('fa-wrench','Maintenance',maint)}
     <div class="mt-3">
-      <div class="flex justify-between text-[12px] mb-1.5" style="color:rgba(255,255,255,0.75)">
+      <div class="flex justify-between text-[12px] mb-1.5 text-lb-600">
         <span><i class="fa-solid fa-gas-pump mr-1"></i>Fuel Level</span>
-        <span style="color:${fc}">${fuel}%</span>
+        <span style="color:${fc};font-weight:600">${fuel}%</span>
       </div>
       <div class="fuel-bar-bg"><div class="fuel-bar-fill" style="width:${fuel}%;background:linear-gradient(90deg,${fc},${fc}88)"></div></div>
     </div>
   `;
 }
 function row(icon,label,val){
-  return `<div class="flex items-center justify-between px-3 py-2.5 rounded-[10px] text-[13px]" style="background:rgba(255,255,255,0.07)">
-    <span class="flex items-center gap-2" style="color:rgba(255,255,255,0.75)"><i class="fa-solid ${icon} w-3.5 text-center"></i>${label}</span>
-    <span class="font-semibold">${val}</span>
+  return `<div class="flex items-center justify-between px-3 py-2.5 rounded-[10px] text-[13px]" style="background:rgba(218,241,255,0.5);border:1px solid rgba(56,175,249,0.12);margin-bottom:4px">
+    <span class="flex items-center gap-2 text-lb-500"><i class="fa-solid ${icon} w-3.5 text-center text-lb-400"></i>${label}</span>
+    <span class="font-semibold text-lb-800">${val}</span>
   </div>`;
 }
 
 // ======= SPARKLINES =======
 const spkDefaults={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},animation:{duration:800}};
 function sparkline(id,data,color){
-  const ctx=document.getElementById(id);
-  if(!ctx)return;
-  new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i),datasets:[{data,borderColor:color,borderWidth:2,pointRadius:0,tension:0.5,fill:true,backgroundColor:color.replace('1)','0.15)').replace('rgb(','rgba(')}]},options:spkDefaults});
+  const c=document.getElementById(id);
+  if(!c)return;
+  new Chart(c,{type:'line',data:{labels:data.map((_,i)=>i),datasets:[{data,borderColor:color,borderWidth:2,pointRadius:0,tension:0.5,fill:true,backgroundColor:color.replace('1)','0.12)')}]},options:spkDefaults});
 }
-function grad(ctx,c1,c2){const g=ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;}
 
 // ======= DASHBOARD INIT =======
 function initDashboard(){
-  setTimeout(()=>{ drawMap(); window.addEventListener('resize',drawMap); },100);
+  setTimeout(()=>{ initOsmMap(); }, 200);
   selectVehicle(document.querySelector('.veh-opt.selected'),'TN-01-AB-1234','Rajesh Kumar',72,68,'Good','98,420',312,'Chennai → Madurai','2h 14m','On Time');
 
-  sparkline('chart_health',  [88,90,92,91,93,95,96],'rgba(77,232,160,1)');
-  sparkline('chart_trips',   [20,25,30,28,32,30,34],'rgba(130,210,255,1)');
-  sparkline('chart_vehicles',[240,242,244,243,245,246,247],'rgba(255,255,255,1)');
-  sparkline('chart_km',      [120,128,134,130,138,140,142],'rgba(255,209,102,1)');
-  sparkline('chart_fuel_eff',[19,18.5,18.8,18.6,18.3,18.5,18.4],'rgba(255,180,100,1)');
-  sparkline('chart_drivers', [180,182,184,186,185,188,189],'rgba(200,180,255,1)');
+  sparkline('chart_health',  [88,90,92,91,93,95,96],'rgba(52,216,181,1)');
+  sparkline('chart_trips',   [20,25,30,28,32,30,34],'rgba(14,150,235,1)');
+  sparkline('chart_vehicles',[240,242,244,243,245,246,247],'rgba(56,175,249,1)');
+  sparkline('chart_km',      [120,128,134,130,138,140,142],'rgba(14,150,235,1)');
+  sparkline('chart_fuel_eff',[19,18.5,18.8,18.6,18.3,18.5,18.4],'rgba(248,113,113,1)');
+  sparkline('chart_drivers', [180,182,184,186,185,188,189],'rgba(56,175,249,1)');
 
-  const shared={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(20,60,90,0.85)',titleColor:'#fff',bodyColor:'rgba(255,255,255,0.8)'}}};
-  const axisCfg={ticks:{color:'rgba(255,255,255,0.5)',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}};
+  const shared={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(7,81,134,0.88)',titleColor:'#fff',bodyColor:'rgba(255,255,255,0.85)'}}};
+  const axisCfg={ticks:{color:'rgba(7,81,134,0.5)',font:{size:10}},grid:{color:'rgba(56,175,249,0.08)'}};
 
-  // Fuel
+  function grad2(canvas,c1,c2){const g=canvas.getContext('2d').createLinearGradient(0,0,0,200);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;}
+
   const fc=document.getElementById('fuelChart');
-  if(fc) new Chart(fc,{type:'line',data:{labels:['Jun 1','Jun 5','Jun 10','Jun 15','Jun 20','Jun 25','Jun 30'],datasets:[{data:[4200,4050,4400,4180,4350,4100,4280],borderColor:'rgba(130,210,255,0.9)',borderWidth:2.5,pointBackgroundColor:'rgba(130,210,255,1)',pointRadius:4,tension:0.5,fill:true,backgroundColor:grad(fc.getContext('2d'),'rgba(130,210,255,0.6)','rgba(130,210,255,0.02)')}]},options:{...shared,scales:{x:axisCfg,y:axisCfg}}});
+  if(fc) new Chart(fc,{type:'line',data:{labels:['Jun 1','Jun 5','Jun 10','Jun 15','Jun 20','Jun 25','Jun 30'],datasets:[{data:[4200,4050,4400,4180,4350,4100,4280],borderColor:'rgba(14,150,235,0.9)',borderWidth:2.5,pointBackgroundColor:'rgba(14,150,235,1)',pointRadius:4,tension:0.5,fill:true,backgroundColor:grad2(fc,'rgba(56,175,249,0.35)','rgba(56,175,249,0.02)')}]},options:{...shared,scales:{x:axisCfg,y:axisCfg}}});
 
-  // Utilization
   const uc=document.getElementById('utilizationChart');
-  if(uc) new Chart(uc,{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{data:[210,225,218,230,222,180,140],backgroundColor:'rgba(255,255,255,0.2)',borderColor:'rgba(255,255,255,0.5)',borderWidth:1.5,borderRadius:8,borderSkipped:false}]},options:{...shared,scales:{x:{...axisCfg,grid:{display:false}},y:axisCfg}}});
+  if(uc) new Chart(uc,{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{data:[210,225,218,230,222,180,140],backgroundColor:'rgba(56,175,249,0.25)',borderColor:'rgba(14,150,235,0.6)',borderWidth:1.5,borderRadius:8,borderSkipped:false}]},options:{...shared,scales:{x:{...axisCfg,grid:{display:false}},y:axisCfg}}});
 
-  // Driver radar
   const dc=document.getElementById('driverChart');
-  if(dc) new Chart(dc,{type:'radar',data:{labels:['Safety','Fuel Eff.','Speed','Timing','Distance'],datasets:[{label:'Top Driver',data:[92,88,85,94,90],backgroundColor:'rgba(77,232,160,0.15)',borderColor:'rgba(77,232,160,0.8)',borderWidth:2,pointBackgroundColor:'rgba(77,232,160,1)',pointRadius:4},{label:'Fleet Avg',data:[78,74,80,82,76],backgroundColor:'rgba(255,255,255,0.05)',borderColor:'rgba(255,255,255,0.35)',borderWidth:1.5,pointBackgroundColor:'rgba(255,255,255,0.5)',pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'rgba(255,255,255,0.6)',font:{size:10}}},tooltip:{backgroundColor:'rgba(20,60,90,0.85)',titleColor:'#fff',bodyColor:'rgba(255,255,255,0.8)'}},scales:{r:{grid:{color:'rgba(255,255,255,0.1)'},angleLines:{color:'rgba(255,255,255,0.1)'},ticks:{display:false},pointLabels:{color:'rgba(255,255,255,0.7)',font:{size:10}}}}}});
+  if(dc) new Chart(dc,{type:'radar',data:{labels:['Safety','Fuel Eff.','Speed','Timing','Distance'],datasets:[{label:'Top Driver',data:[92,88,85,94,90],backgroundColor:'rgba(52,216,181,0.12)',borderColor:'rgba(52,216,181,0.8)',borderWidth:2,pointBackgroundColor:'rgba(52,216,181,1)',pointRadius:4},{label:'Fleet Avg',data:[78,74,80,82,76],backgroundColor:'rgba(56,175,249,0.06)',borderColor:'rgba(56,175,249,0.4)',borderWidth:1.5,pointBackgroundColor:'rgba(56,175,249,0.6)',pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'rgba(7,81,134,0.7)',font:{size:10}}},tooltip:{backgroundColor:'rgba(7,81,134,0.88)',titleColor:'#fff',bodyColor:'rgba(255,255,255,0.85)'}},scales:{r:{grid:{color:'rgba(56,175,249,0.12)'},angleLines:{color:'rgba(56,175,249,0.12)'},ticks:{display:false},pointLabels:{color:'rgba(7,81,134,0.7)',font:{size:10}}}}}});
 
-  // Distance
   const distC=document.getElementById('distanceChart');
-  if(distC) new Chart(distC,{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{data:[128,122,135,138,140,142],borderColor:'rgba(255,209,102,0.9)',borderWidth:2.5,pointBackgroundColor:'rgba(255,209,102,1)',pointRadius:4,tension:0.5,fill:true,backgroundColor:grad(distC.getContext('2d'),'rgba(255,209,102,0.5)','rgba(255,209,102,0.02)')}]},options:{...shared,scales:{x:axisCfg,y:axisCfg}}});
+  if(distC) new Chart(distC,{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{data:[128,122,135,138,140,142],borderColor:'rgba(14,150,235,0.9)',borderWidth:2.5,pointBackgroundColor:'rgba(14,150,235,1)',pointRadius:4,tension:0.5,fill:true,backgroundColor:grad2(distC,'rgba(56,175,249,0.35)','rgba(56,175,249,0.02)')}]},options:{...shared,scales:{x:axisCfg,y:axisCfg}}});
 }
 </script>
 </body>
